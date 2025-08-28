@@ -12,8 +12,7 @@ builder.Services
     .AddDiscordGateway((options, _) =>
     {
         options.Token = Config.GetBotToken();
-    })
-    .AddApplicationCommands();
+    });
 
 var host = builder.Build();
 

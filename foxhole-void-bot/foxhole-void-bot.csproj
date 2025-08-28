@@ -43,6 +43,7 @@
     <None Include="src\.env" />
     <Compile Include="src\Config.cs" />
     <Compile Include="src\Main.cs" />
+    <Compile Include="src\repositories\Cache.cs" />
     <Compile Include="src\repositories\Stockpiles.cs" />
   </ItemGroup>
   <ItemGroup>
