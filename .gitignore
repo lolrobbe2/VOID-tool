@@ -52,3 +52,9 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+/.vs/foxhole-void/DesignTimeBuild
+/.vs/foxhole-void/FileContentIndex
+/.vs/ProjectEvaluation
+/.vs/foxhole-void/v17
+/foxhole-void-bot/src/.env
+foxhole-void-bot/.env
