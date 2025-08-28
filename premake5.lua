@@ -23,7 +23,7 @@ dotnetsdk "Web"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
 files { "%{prj.name}/src/**.cs", "%{prj.name}/src/**.env" }       -- Include all C# source files
-nuget { "NetCord:1.0.0-alpha.416", "DotNetEnv:3.1.1", "NetCord.Hosting:1.0.0-alpha.416", "NetCord.Hosting.Services:1.0.0-alpha.416", "Firebase.SDK:3.1.0" }
+nuget { "NetCord:1.0.0-alpha.416", "DotNetEnv:3.1.1", "NetCord.Hosting:1.0.0-alpha.416", "NetCord.Hosting.Services:1.0.0-alpha.416", "Google.Cloud.Firestore:3.10.0", "Microsoft.AspNetCore.OpenApi:9.0.8", "Swashbuckle.AspNetCore:9.0.4" }
       vsprops {
          PublishSingleFile = "true",
          SelfContained = "true",
