@@ -61,7 +61,7 @@ public class StockpileCommands : ApplicationCommandModule<ApplicationCommandCont
     }
 }
 
-public class RegionAutocompleteProvider : IAutocompleteProvider<IAutocompleteInteractionContext>
+public class RegionAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
 {
     private readonly StockpilesRepository _repository;
 
@@ -70,7 +70,7 @@ public class RegionAutocompleteProvider : IAutocompleteProvider<IAutocompleteInt
         _repository = repository;
     }
 
-    public async ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, IAutocompleteInteractionContext context)
+    public async ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, AutocompleteInteractionContext context)
     {
         var userInput = option.Value?.ToString() ?? string.Empty;
 
