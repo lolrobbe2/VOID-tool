@@ -20,7 +20,9 @@ builder.Services
     .AddDiscordGateway((options, _) =>
     {
         options.Token = Config.GetBotToken();
-    });
+    })
+    .AddApplicationCommands();
+
 
 
 builder.Services.AddControllers();
