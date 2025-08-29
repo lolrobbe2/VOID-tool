@@ -40,6 +40,7 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\commands\StockpilesModule.cs" />
     <Compile Include="src\Config.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
@@ -49,12 +50,12 @@
     <Compile Include="src\repositories\Stockpiles.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NetCord" Version="1.0.0-alpha.416"/>
-    <PackageReference Include="DotNetEnv" Version="3.1.1"/>
-    <PackageReference Include="NetCord.Hosting" Version="1.0.0-alpha.416"/>
-    <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.416"/>
-    <PackageReference Include="Google.Cloud.Firestore" Version="3.10.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4"/>
+    <PackageReference Include="NetCord" Version="1.0.0-alpha.416" />
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="NetCord.Hosting" Version="1.0.0-alpha.416" />
+    <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.416" />
+    <PackageReference Include="Google.Cloud.Firestore" Version="3.10.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
   </ItemGroup>
 </Project>
