@@ -9,17 +9,6 @@ using System.Threading.Tasks;
 #nullable enable
 namespace FoxholeBot.repositories
 {
-
-    [FirestoreData]
-    public class StockPileItem
-    {
-        [FirestoreProperty]
-        public byte Count { get; set; }
-
-        [FirestoreProperty]
-        public string Name { get; set; }
-    }
-
     [FirestoreData]
     public class StockPile
     {

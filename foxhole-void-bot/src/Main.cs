@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddMemoryCache()
     .AddScoped<StockpilesRepository>()
+    .AddScoped<FoxholeRepository>()
     .AddFirebase()
     .AddDiscordGateway((options, _) =>
     {

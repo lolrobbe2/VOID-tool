@@ -95,5 +95,9 @@ namespace FoxholeBot
         {
             return GetEnvVariable("FIREBASE_CLIENT_X509_CERT_URL");
         }
+        public static string GetFoxholeShardURL()
+        {
+            return GetEnvVariable("SHARD");
+        }
     }
 }
