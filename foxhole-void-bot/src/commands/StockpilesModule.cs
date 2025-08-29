@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 [SlashCommand("stockpiles", "Stockpiles command")]
-public class StockpileCommands : ApplicationCommandModule<SlashCommandContext>
+public class StockpileCommands : ApplicationCommandModule<ApplicationCommandContext>
 {
     private readonly StockpilesRepository _repository;
 
@@ -14,7 +14,7 @@ public class StockpileCommands : ApplicationCommandModule<SlashCommandContext>
     }
 
     [SubSlashCommand("list", "Get stockpiles")]
-    public async Task<string> ListStockpiles(SlashCommandContext context)
+    public async Task<string> ListStockpiles()
     {
         var stockpiles = await _repository.GetAllStockpilesAsync() ;
 
