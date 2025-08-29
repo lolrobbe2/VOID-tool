@@ -23,7 +23,7 @@ public class StockpileCommands : ApplicationCommandModule<ApplicationCommandCont
     [SubSlashCommand("list", "Get stockpiles")]
     public async Task<string> ListStockpiles([SlashCommandParameter(Name = "region", Description = "the region/hex name", AutocompleteProviderType = typeof(RegionAutocompleteProvider))] string? region)
     {
-        if (region == null)
+        if (string.IsNullOrEmpty(region) || region.Equals("none"))
             return await GetStockpilesRegion(region!);
         return await GetStockpiles();
     }
@@ -75,7 +75,7 @@ public class RegionAutocompleteProvider : IAutocompleteProvider<AutocompleteInte
         var userInput = option.Value?.ToString() ?? string.Empty;
 
         string[] regions = await _repository.GetStockpileRegions();
-
+        regions = regions.Append("none").ToArray();
         return regions.Where(r => r.Contains(userInput, StringComparison.OrdinalIgnoreCase)).OrderBy(r => r).Take(5).Select(r => new ApplicationCommandOptionChoiceProperties(r, r));
     }
 }
