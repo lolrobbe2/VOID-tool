@@ -1,6 +1,6 @@
 require "vstudio"
 function platformsElement(cfg)
-   _p(2,'<Platforms>x64</Platforms>')
+   _p(2, '<Platforms>AnyCpu;arm64;x64</Platforms>')
 end
 
 premake.override(premake.vstudio.cs2005.elements, "projectProperties", function (oldfn, cfg)
