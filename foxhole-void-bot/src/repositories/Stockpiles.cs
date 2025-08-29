@@ -86,5 +86,10 @@ namespace FoxholeBot.repositories
             _cache.CacheInvalidate(region);
             return await GetRegionStockpiles(region);
         }
+
+        public async Task<string[]> GetStockpileRegions()
+        {
+            return (await GetAllStockpilesAsync()).Select(stockpile => stockpile.Region).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        }
     }
 }

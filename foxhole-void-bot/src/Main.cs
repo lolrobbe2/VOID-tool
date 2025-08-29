@@ -21,7 +21,11 @@ builder.Services
     {
         options.Token = Config.GetBotToken();
     })
-    .AddApplicationCommands();
+    .AddApplicationCommands((options) =>
+    {
+        options.AutoRegisterCommands = true;
+    });
+
 
 
 
@@ -36,6 +40,5 @@ if (host.Environment.IsDevelopment())
 }
 host.MapControllers();
 // Add commands from modules
-host.AddModules(typeof(Program).Assembly);
-
+host.AddApplicationCommandModule(typeof(StockpileCommands));
 await host.RunAsync();
