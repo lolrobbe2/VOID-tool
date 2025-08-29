@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 [SlashCommand("stockpiles", "Stockpiles command")]
-public class StockpileCommands
+public class StockpileCommands : ApplicationCommandModule<ApplicationCommandContext>
 {
     private readonly StockpilesRepository _repository;
 
