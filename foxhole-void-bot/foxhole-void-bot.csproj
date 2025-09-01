@@ -40,6 +40,7 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Components\VideoCarousel\VideoCarouselViewComponent.cs" />
     <Compile Include="src\Config.cs" />
     <Compile Include="src\controllers\FoxholeController.cs" />
     <Compile Include="src\controllers\HealtController.cs" />
@@ -52,6 +53,9 @@
     <Compile Include="src\repositories\Foxhole.cs" />
     <Compile Include="src\repositories\StockpileItems.cs" />
     <Compile Include="src\repositories\Stockpiles.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="src\Pages\site.css" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NetCord" Version="1.0.0-alpha.416" />
