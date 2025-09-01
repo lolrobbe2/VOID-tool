@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddMemoryCache()
     .AddScoped<StockpilesRepository>()
+    .AddScoped<StockPileItemsRepository>()
     .AddScoped<FoxholeRepository>()
     .AddFirebase()
     .AddDiscordGateway((options, _) =>
@@ -25,7 +26,8 @@ builder.Services
     .AddApplicationCommands((options) =>
     {
         options.AutoRegisterCommands = true;
-    });
+    })
+    .AddRazorPages((options) => options.RootDirectory = "/src/Pages");
 
 
 
@@ -40,6 +42,7 @@ if (host.Environment.IsDevelopment())
     host.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "VOID api"));
 }
 host.MapControllers();
+host.MapRazorPages();
 // Add commands from modules
 host.AddApplicationCommandModule(typeof(StockpileCommands));
 await host.RunAsync();
