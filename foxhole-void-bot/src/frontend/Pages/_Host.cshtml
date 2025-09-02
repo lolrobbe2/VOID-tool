@@ -1,0 +1,20 @@
+﻿@page "/"
+@using foxhole_void_bot.src.frontend.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Foxhole VOID Bot</title>
+</head>
+<body>
+    <app>
+        <component type="typeof(App)" render-mode="Server" />
+    </app>
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+﻿@using FoxholeBot
+@inherits LayoutComponentBase
+@inject Microsoft.Extensions.Options.IOptions<AssetOptions> AssetConfig
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Title</title>
+
+    <link href="/css/foxhole-void-bot.styles.css" rel="stylesheet">
+
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+</head>
+<body>
+    @Body
+</body>
+</html>
+
+@code {
+    private string Title => "Foxhole VOID Bot";
+
+    protected override void OnInitialized()
+    {
+        var assetMode = AssetConfig.Value.AssetMode;
+        Console.WriteLine($"Mode: {assetMode}");
+    }
+}

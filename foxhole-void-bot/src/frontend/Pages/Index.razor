@@ -1,0 +1,15 @@
+@page "/"
+@using FoxholeBot.Components
+
+<h1>Hello, world!</h1>
+<h2>The time on the server is @DateTime.Now</h2>
+
+<VideoCarousel VideoUrls="@myVideoList" />
+
+@code {
+    private List<string> myVideoList = new()
+    {
+        "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main/foxhole-void-bot/assets/videos/demo1.webm",
+        "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main/foxhole-void-bot/assets/videos/demo2.webm"
+    };
+}
