@@ -1,0 +1,34 @@
+﻿@using FoxholeBot
+@inject Microsoft.Extensions.Options.IOptions<AssetOptions> AssetConfig
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        let index = 0;
+        const items = document.querySelectorAll('.carousel-item');
+
+        setInterval(() => {
+            items[index].style.display = 'none';
+            index = (index + 1) % items.length;
+            items[index].style.display = 'block';
+        }, 5000); // 5 seconds per video
+    </script>
+
+    @{
+        string assetMode = AssetConfig.Value.AssetMode;
+        Console.WriteLine($"Mode: {assetMode}");
+    }
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+
+    <link rel="stylesheet" href="/css/site.css" />
+
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

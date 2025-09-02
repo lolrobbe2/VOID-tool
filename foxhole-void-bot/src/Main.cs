@@ -2,6 +2,7 @@
 using FoxholeBot;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -27,7 +28,22 @@ builder.Services
     {
         options.AutoRegisterCommands = true;
     })
-    .AddRazorPages((options) => options.RootDirectory = "/src/Pages");
+    .AddRazorPages()
+    .AddRazorRuntimeCompilation().WithRazorPagesRoot("/src/frontend/Pages");
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    options.ViewLocationFormats.Clear();
+
+    options.ViewLocationFormats.Add("/src/frontend/Components/{1}/{0}.cshtml");
+});
+builder.Services.Configure<AssetOptions>(options =>
+{
+    options.AssetMode = Config.GetAssetMode();
+});
+builder.Services.AddMvc();
+
+
+
 
 
 

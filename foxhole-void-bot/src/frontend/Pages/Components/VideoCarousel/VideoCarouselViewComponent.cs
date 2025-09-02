@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-
-public class VideoCarouselViewComponent : ViewComponent
+namespace FoxholeBot.Components
 {
-    public IViewComponentResult Invoke()
+    public class VideoCarouselViewComponent : ViewComponent
     {
-        var videoUrls = new List<string>
+        public IViewComponentResult Invoke()
+        {
+            var videoUrls = new List<string>
         {
             "https://www.youtube.com/embed/i-CYRlveLnU",
             "https://www.youtube.com/embed/HHLzJd2FOQQ",
@@ -13,6 +14,7 @@ public class VideoCarouselViewComponent : ViewComponent
             // Add more URLs as needed
         };
 
-        return View(videoUrls);
+            return View(videoUrls);
+        }
     }
 }

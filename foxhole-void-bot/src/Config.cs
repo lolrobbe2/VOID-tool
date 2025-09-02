@@ -99,5 +99,15 @@ namespace FoxholeBot
         {
             return GetEnvVariable("SHARD");
         }
+
+        public static string GetAssetMode()
+        {
+            return GetEnvVariable("ASSET_MODE");
+        }
+
+        public static string GetBootstrapCSS()
+        {
+            return (GetEnvVariable("ASSET_MODE") == "LOCAL") ? "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" : "";
+        }
     }
 }
