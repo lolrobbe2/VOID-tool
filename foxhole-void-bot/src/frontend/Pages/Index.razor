@@ -1,9 +1,8 @@
 @page "/"
 @using FoxholeBot.Components
+@using foxhole_void_bot.src.frontend.Pages.Components.Banner
 
-<h1>Hello, world!</h1>
-<h2>The time on the server is @DateTime.Now</h2>
-
+<Banner />
 <VideoCarousel VideoUrls="@myVideoList" />
 
 @code {

@@ -1,14 +1,16 @@
 ﻿#videoBackgroundCarousel {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     position: absolute;
     top: 0;
-    left: 15vw; /* Offset from the left */
-    width: 85vw; /* Remaining width */
+    left: 15%; /* Offset from the left */
+    width: 85%; /* Remaining width */
     height: 100vh; /* Full viewport height */
     z-index: -1;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #1b1b1b;
 }
 
 .carousel-item {
@@ -25,6 +27,7 @@
 }
 
     .carousel-item.active {
+        transition: opacity 0.8s ease-in-out;
         opacity: 1;
         display: flex;
     }
@@ -33,5 +36,5 @@
         max-width: 100%;
         max-height: 100%;
         object-fit: contain; /* Ensures best aspect ratio fit */
-        pointer-events: none;
+        pointer-events: auto;
     }

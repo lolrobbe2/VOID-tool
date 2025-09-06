@@ -19,16 +19,18 @@
 </div>
 
 <script>
-    window.reloadAndPlayVideo = function (videoElement) {
-        if (videoElement) {
-            videoElement.muted = true;
-            videoElement.load();
-            videoElement.play().catch(err => console.warn("Autoplay failed:", err));
-        }
+    window.reloadAndPlayVideo = function (videoElement, offsetSeconds) {
+    if (videoElement) {
+    videoElement.muted = true;
+    videoElement.currentTime = offsetSeconds || 0; // Jump to offset
+    videoElement.load();
+    videoElement.play().catch(err => console.warn("Autoplay failed:", err));
+    }
     };
 </script>
 
 @code {
+    #nullable enable
     [Parameter]
     public List<string> VideoUrls { get; set; } = new();
 
@@ -36,7 +38,7 @@
     private Timer? carouselTimer;
     private ElementReference videoRef;
     private bool hasInitialized = false;
-
+    private Random random = new Random();
     protected override void OnInitialized()
     {
         carouselTimer = new Timer(7000);
@@ -49,7 +51,9 @@
             {
                 StateHasChanged(); // Trigger re-render
                 await Task.Delay(50); // Let DOM update
-                await JS.InvokeVoidAsync("reloadAndPlayVideo", videoRef);
+                var offset = random.Next(0, 10); // Random offset between 1–5 seconds
+                await JS.InvokeVoidAsync("reloadAndPlayVideo", videoRef,offset);
+                carouselTimer.Interval = random.Next(10000, 20000);
             });
         };
         carouselTimer.AutoReset = true;

@@ -1,22 +1,12 @@
-﻿@using FoxholeBot
+﻿@using FoxholeBot;
+@using foxhole_void_bot.src.frontend.Pages.Components.SideBar
 @inherits LayoutComponentBase
 @inject Microsoft.Extensions.Options.IOptions<AssetOptions> AssetConfig
+<div class="body">
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Title</title>
-
-    <link href="/css/foxhole-void-bot.styles.css" rel="stylesheet">
-
-    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
-</head>
-<body>
+    <SideBar />
     @Body
-</body>
-</html>
+</div>
 
 @code {
     private string Title => "Foxhole VOID Bot";

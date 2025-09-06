@@ -1,0 +1,26 @@
+﻿.glass-panel {
+    position: relative;
+    margin-left: 35%;
+    margin-top: 10rem;
+    background-color: rgba(42, 42, 42, 0.5); /* semi-transparent */
+    border-radius: 1rem;
+    padding: 1rem;
+    backdrop-filter: blur(8px); /* glassy blur */
+    -webkit-backdrop-filter: blur(8px); /* Safari support */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+
+.glass-title {
+    font-size: 4rem;
+    color: #4a5c4d; /* colors.highlight */
+    margin-bottom: 1.5rem;
+}
+
+.glass-description {
+    font-size: 1.25rem;
+    color: #e0e0d1; /* colors.text */
+}
