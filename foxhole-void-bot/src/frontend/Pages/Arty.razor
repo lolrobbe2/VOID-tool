@@ -1,5 +1,12 @@
 ﻿@page "/arty"
-@using foxhole_void_bot.src.frontend.Pages.Components.MapSelect
-<MapSelect />
-@{
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapSelect
+<MapSelect OnMapSelected="@HandleMapSelection" />
+
+@code {
+    private void HandleMapSelection((string Uri, string Name) selection)
+    {
+        Console.WriteLine($"Map selected: {selection.Name} ({selection.Uri})");
+        // You can now load the map, update UI, etc.
+    }
 }
+

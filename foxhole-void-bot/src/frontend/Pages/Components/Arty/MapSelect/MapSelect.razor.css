@@ -1,12 +1,12 @@
 ﻿.map-selector {
-    width: 10%;
+    width: 12.5%;
     height: 100vh;
     max-height: 100vh;
     background-color: #2a2a2a;
     border-left: 2px solid white;
     z-index: 0;
     top: 0;
-    left: 15%;
+    left: 12.5%;
     position: absolute;
 }
 
@@ -45,5 +45,5 @@
 }
 
     .map-button:hover {
-        background-color: #d0d0d0;
+        background-color: #4a5c4d; /* Slightly lighter on hover */
     }

@@ -1,4 +1,7 @@
 ﻿@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
 @inject IJSRuntime JS
 
 <div class="map-selector">
@@ -6,9 +9,9 @@
         <input type="text" value="@searchTerm" oninput="@OnSearchInput" class="search-bar" />
         <div class="button-container">
             <div class="button-list">
-                @foreach (var map in filteredMaps)
+                @foreach (var map in filteredEntries)
                 {
-                    <button class="map-button">@map</button>
+                    <button class="map-button" @onclick="(() => HandleMapClick(map.Uri, map.Name))">@map.Name</button>
                 }
             </div>
         </div>
@@ -17,45 +20,59 @@
 
 
 @code {
-    private List<string> mapNames = new();
+    private class MapEntry
+    {
+        public string Name { get; set; } = "";
+        public string Uri { get; set; } = "";
+    }
+    [Parameter]
+    public EventCallback<(string Uri, string Name)> OnMapSelected { get; set; }
     private string searchTerm = string.Empty;
-    private List<string> filteredMaps = new();
+    private List<MapEntry> mapEntries = new();
+    private List<MapEntry> filteredEntries = new();
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             var urls = await JS.InvokeAsync<string[]>("fetchMapUrls");
 
-            mapNames = urls.Select(url =>
+            mapEntries = urls.Select(url =>
             {
                 var filename = System.IO.Path.GetFileName(url);
                 var trimmed = filename.Replace("Map", "").Replace("Hex.webp", "").Replace(".webp", "");
 
-                // Split on capital letters and lowercase each word
                 var words = System.Text.RegularExpressions.Regex
                     .Matches(trimmed, @"[A-Z][a-z]*")
                     .Select(m => m.Value.ToLower());
 
-                return string.Join(" ", words);
-            }).ToList();
+                var name = string.Join(" ", words);
 
-            UpdateFilteredMaps(); // if you're using a filtered list
+                return new MapEntry { Name = name, Uri = url };
+            }).ToList();
+            filteredEntries = mapEntries;
             StateHasChanged();
+
         }
 
     }
 
     private void UpdateFilteredMaps()
     {
-        filteredMaps = string.IsNullOrWhiteSpace(searchTerm)
-            ? mapNames
-            : mapNames.Where(name => name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        filteredEntries = string.IsNullOrWhiteSpace(searchTerm)
+            ? mapEntries
+            : mapEntries.Where(entry => entry.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
     }
+
 
     private void OnSearchInput(ChangeEventArgs e)
     {
         searchTerm = e.Value?.ToString() ?? string.Empty;
         UpdateFilteredMaps();
+    }
+
+    private void HandleMapClick(string uri, string name)
+    {
+        OnMapSelected.InvokeAsync((uri, name));
     }
 }
 

@@ -2,8 +2,8 @@
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     position: absolute;
     top: 0;
-    left: 15%; /* Offset from the left */
-    width: 85%; /* Remaining width */
+    left: 12.5%; /* Offset from the left */
+    width: 87.5%; /* Remaining width */
     height: 100vh; /* Full viewport height */
     z-index: -1;
     overflow: hidden;
