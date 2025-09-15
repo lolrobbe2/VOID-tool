@@ -1,14 +1,52 @@
 @page "/"
 @using FoxholeBot.Components
 @using foxhole_void_bot.src.frontend.Pages.Components.Banner
+@using System.Net.Http.Json
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+@* Embedded JavaScript *@
+<script>
+    window.fetchVideos = async function () {
+    try {
+    const response = await fetch("/api/Assets/Carousel");
+    if (!response.ok) {
+    throw new Error("Failed to fetch videos: " + response.status);
+    }
+    return await response.json();
+    } catch (err) {
+    console.error(err);
+    return [];
+    }
+    };
+</script>
 
 <Banner />
-<VideoCarousel VideoUrls="@myVideoList" />
+
+@if (myVideoList.Count > 0)
+{
+    <VideoCarousel VideoUrls="@myVideoList" />
+}
+
 
 @code {
-    private List<string> myVideoList = new()
+    private List<string> myVideoList = new();
+    private bool _loaded = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main/foxhole-void-bot/assets/videos/demo1.webm",
-        "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main/foxhole-void-bot/assets/videos/demo2.webm"
-    };
+        if (firstRender && !_loaded)
+        {
+            try
+            {
+                myVideoList = await JS.InvokeAsync<List<string>>("fetchVideos");
+                _loaded = true;
+                StateHasChanged(); // re-render after data arrives
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to load carousel via JS: {ex.Message}");
+                myVideoList = new List<string>(); // fallback
+            }
+        }
+    }
 }

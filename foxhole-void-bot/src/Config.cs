@@ -109,5 +109,10 @@ namespace FoxholeBot
         {
             return (GetEnvVariable("ASSET_MODE") == "LOCAL") ? "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" : "";
         }
-    }
+
+        public static string GetAssetUri()
+        {
+            return (GetEnvVariable("ASSET_MODE") == "LOCAL") ? "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main" : "/github";
+        }
+    }   
 }

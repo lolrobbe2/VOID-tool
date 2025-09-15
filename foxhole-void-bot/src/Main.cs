@@ -13,6 +13,7 @@ using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
 using NetCord.Rest;
+using System;
 using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,7 @@ builder.Services
     {
         options.AutoRegisterCommands = true;
     })
+.AddHttpClient()
 
     .AddRazorPages()
     .AddRazorRuntimeCompilation().WithRazorPagesRoot("/src/frontend/Pages");

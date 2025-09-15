@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="src\AssetOptions.cs" />
     <Compile Include="src\Config.cs" />
+    <Compile Include="src\controllers\AssetsController.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
     <Compile Include="src\Main.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="src\controllers\FoxholeController.cs" />
     <Compile Include="src\controllers\HealtController.cs" />
     <Compile Include="src\controllers\StockpileController.cs" />
+    <Compile Include="src\repositories\Assets.cs" />
     <Compile Include="src\repositories\Cache.cs" />
     <Compile Include="src\repositories\Foxhole.cs" />
     <Compile Include="src\repositories\StockpileItems.cs" />

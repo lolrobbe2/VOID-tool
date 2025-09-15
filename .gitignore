@@ -58,3 +58,4 @@ nunit-*.xml
 /.vs/foxhole-void/v17
 /foxhole-void-bot/src/.env
 foxhole-void-bot/.env
+/.vs/foxhole-void/CopilotIndices/17.14.1147.5054

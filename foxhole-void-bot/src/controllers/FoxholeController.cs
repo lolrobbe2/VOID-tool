@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FoxholeBot.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class FoxholeController : ControllerBase
     {
         private readonly FoxholeRepository _repository;
