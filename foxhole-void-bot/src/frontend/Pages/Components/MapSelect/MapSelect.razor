@@ -1,0 +1,73 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<div class="map-selector">
+    <div class="map-sidebar">
+        <input type="text" value="@searchTerm" oninput="@OnSearchInput" class="search-bar" />
+        <div class="button-container">
+            <div class="button-list">
+                @foreach (var map in filteredMaps)
+                {
+                    <button class="map-button">@map</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private List<string> mapNames = new();
+    private string searchTerm = string.Empty;
+    private List<string> filteredMaps = new();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var urls = await JS.InvokeAsync<string[]>("fetchMapUrls");
+
+            mapNames = urls.Select(url =>
+            {
+                var filename = System.IO.Path.GetFileName(url);
+                var trimmed = filename.Replace("Map", "").Replace("Hex.webp", "").Replace(".webp", "");
+
+                // Split on capital letters and lowercase each word
+                var words = System.Text.RegularExpressions.Regex
+                    .Matches(trimmed, @"[A-Z][a-z]*")
+                    .Select(m => m.Value.ToLower());
+
+                return string.Join(" ", words);
+            }).ToList();
+
+            UpdateFilteredMaps(); // if you're using a filtered list
+            StateHasChanged();
+        }
+
+    }
+
+    private void UpdateFilteredMaps()
+    {
+        filteredMaps = string.IsNullOrWhiteSpace(searchTerm)
+            ? mapNames
+            : mapNames.Where(name => name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+        UpdateFilteredMaps();
+    }
+}
+
+<script>
+    window.fetchMapUrls = async function () {
+        try {
+            const response = await fetch('/api/Assets/Map');
+            if (!response.ok) throw new Error('Failed to fetch map URLs');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching map URLs:', error);
+            return [];
+        }
+    };
+</script>

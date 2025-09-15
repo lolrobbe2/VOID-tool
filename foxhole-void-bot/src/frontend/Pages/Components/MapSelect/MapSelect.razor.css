@@ -1,0 +1,49 @@
+﻿.map-selector {
+    width: 10%;
+    height: 100vh;
+    max-height: 100vh;
+    background-color: #2a2a2a;
+    border-left: 2px solid white;
+    z-index: 0;
+    top: 0;
+    left: 15%;
+    position: absolute;
+}
+
+.map-sidebar {
+    height: 100%;
+}
+.button-container {
+    height: 94.5vh;
+    overflow: auto;
+}
+.search-bar {
+    flex: 0 0 auto; /* Prevent shrinking or growing */
+    width: 100%;
+    height: 5vh;
+    padding-top: 2.5vh;
+    padding-bottom: 2.5vh;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.button-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.map-button {
+    height: 5vh;
+    background-color: #2a2a2a;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s ease;
+    color: #7a5c3c;
+    font-weight:bold;
+    font-size:medium;
+}
+
+    .map-button:hover {
+        background-color: #d0d0d0;
+    }
