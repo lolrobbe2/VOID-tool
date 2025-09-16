@@ -55,6 +55,8 @@
     <Compile Include="src\repositories\Foxhole.cs" />
     <Compile Include="src\repositories\StockpileItems.cs" />
     <Compile Include="src\repositories\Stockpiles.cs" />
+    <Compile Include="src\types\ArtyGun.cs" />
+    <Compile Include="src\types\CoordsVector.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NetCord" Version="1.0.0-alpha.416" />
