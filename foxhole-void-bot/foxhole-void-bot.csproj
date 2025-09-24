@@ -57,6 +57,8 @@
     <Compile Include="src\repositories\Stockpiles.cs" />
     <Compile Include="src\types\ArtyGun.cs" />
     <Compile Include="src\types\CoordsVector.cs" />
+    <Compile Include="src\types\Wind.cs" />
+    <Compile Include="src\types\WindVector.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NetCord" Version="1.0.0-alpha.416" />

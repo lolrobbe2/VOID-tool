@@ -1,0 +1,11 @@
+﻿<div class="map-marker" style="@Style"></div>
+
+@code {
+    [Parameter] public double X { get; set; } // screen-space X
+    [Parameter] public double Y { get; set; } // screen-space Y
+    [Parameter] public double offsetX { get; set; } // optional offset
+    [Parameter] public double offsetY { get; set; } // optional offset
+    [Parameter] public double scale { get; set; }
+    private string Style =>
+        $"left:{X}px; top:{Y}px;";
+}

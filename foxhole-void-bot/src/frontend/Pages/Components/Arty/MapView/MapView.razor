@@ -1,0 +1,126 @@
+﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components.Web
+@using System.Globalization
+@using Microsoft.JSInterop
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapMarker
+
+<div class="map-view"
+     style="@ContainerStyle"
+     @onwheel="OnWheel"
+     @onmousedown="OnMouseDown"
+     @onmouseup="OnMouseUp"
+     @onmousemove="OnMouseMove">
+
+    <div class="map-transform" style="@TransformStyle">
+        <img id ="mapImage"
+             src="@uri"
+             alt="@name"
+             style="width:100%; height:100%; display:block;"
+             draggable="false"
+             @onclick="HandleClick" />
+        <MapMarker X="300" Y="300" scale="@scale" />
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter] public string uri { get; set; }
+    [Parameter] public string name { get; set; }
+    [Parameter] public EventCallback<(Coordinate, UInt16, UInt16)> OnImageClick { get; set; }
+    [Parameter] public EventCallback<(UInt16, UInt16)> OnMove { get; set; }
+    [Parameter] public int ImageWidth { get; set; } = 2048;
+    [Parameter] public int ImageHeight { get; set; } = 1776;
+    private string lastUri;
+    private double scale = 1.0;
+    private double offsetX = 0;
+    private double offsetY = 0;
+    private bool isPanning = false;
+    private double lastX, lastY;
+
+    private string TransformStyle =>
+     $"transform: translate({offsetX}px, {offsetY}px) scale({scale.ToString("F2", CultureInfo.InvariantCulture)}, {scale.ToString("F2", CultureInfo.InvariantCulture)});";
+
+    private string ContainerStyle =>
+    $"cursor: {(isPanning ? "grabbing" : "default")};";
+
+    protected override void OnParametersSet()
+    {
+        if (uri != lastUri)
+        {
+            scale = 1.0;
+            offsetX = 0;
+            offsetY = 0;
+
+            lastUri = uri;
+        }
+    }
+
+
+    private void OnWheel(WheelEventArgs e)
+    {
+        const double zoomFactor = 0.1;
+        scale += e.DeltaY < 0 ? zoomFactor : -zoomFactor;
+        scale = Math.Clamp(scale, 1.0, 5.0);
+    }
+
+    private void OnMouseDown(MouseEventArgs e)
+    {
+        if (e.Button == 1)
+        {
+            isPanning = true;
+            lastX = e.ClientX;
+            lastY = e.ClientY;
+        }
+    }
+
+    private void OnMouseUp(MouseEventArgs e)
+    {
+        if (e.Button == 1)
+        {
+            isPanning = false;
+        }
+    }
+
+    private void OnMouseMove(MouseEventArgs e)
+    {
+        if (isPanning)
+        {
+            offsetX += e.ClientX - lastX;
+            offsetY += e.ClientY - lastY;
+            lastX = e.ClientX;
+            lastY = e.ClientY;
+            OnMove.InvokeAsync(((UInt16)offsetX, (UInt16)offsetY));
+        }
+    }
+    [Inject] private IJSRuntime JS { get; set; }
+
+    private async Task HandleClick(MouseEventArgs e)
+    {
+        var size = await JS.InvokeAsync<ImageSize>("getImageSize", "mapImage");
+        // Map to native image pixels
+        double pixelX = e.OffsetX * (ImageWidth / (size.Width / scale));
+        double pixelY = e.OffsetY * (ImageHeight / (size.Height / scale));
+
+
+        var coord = new Coordinate()
+        {
+            X = (ushort)Math.Clamp(pixelX, 0, ImageWidth),
+            Y = (ushort)Math.Clamp(pixelY, 0, ImageHeight)
+        };
+
+        await OnImageClick.InvokeAsync((coord, (UInt16)e.OffsetX, (UInt16)e.OffsetY ));
+    }
+
+    private record ImageSize(double Width, double Height);
+
+}
+
+<script>
+    window.getImageSize = (id) => {
+        const img = document.getElementById(id);
+        if (!img) return null;
+        const rect = img.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+    };
+</script>

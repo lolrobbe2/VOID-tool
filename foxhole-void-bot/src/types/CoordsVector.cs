@@ -6,11 +6,26 @@ namespace FoxholeBot.types
     {
         public UInt16 X;
         public UInt16 Y;
+
+        public static Coordinate operator +(Coordinate a, Coordinate b)
+        {
+            return new Coordinate() { X = (ushort)(a.X + b.X), Y = (ushort)(a.Y + b.Y) };
+        }
+
+        public static Coordinate operator -(Coordinate a, Coordinate b)
+        {
+            return new Coordinate() { X = (ushort)(a.X - b.X), Y = (ushort)(a.Y - b.Y) };
+        }
     }
     public class CoordsVector
     {
-        Coordinate start;
-        Coordinate end;
+        public Coordinate start { get; set; }
+        public Coordinate end { get; set; }
+
+        public static CoordsVector operator +(CoordsVector a, CoordsVector b)
+        {
+            return new CoordsVector() { start = a.start + b.start, end = a.end + b.end };
+        }
 
         /// <summary>
         /// This function calculates the vertical distance of the two coordintates

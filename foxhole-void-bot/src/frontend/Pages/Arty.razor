@@ -1,12 +1,51 @@
 ﻿@page "/arty"
+@using FoxholeBot.types
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapMarker
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapSelect
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapView
 <MapSelect OnMapSelected="@HandleMapSelection" />
+@if (!string.IsNullOrEmpty(selectedUri))
+{
+    
+        <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" />
+
+        @if (screenX != 0 || screenY != 0)
+        {
+            <MapMarker X="@screenX" Y="@screenY" offsetX="@offsetX" offsetY="@offsetY" scale="@scale" />
+        }
+}
 
 @code {
+    private double metersPerPixel = 1900 / 1776; 
+    private string selectedUri;
+    private string selectedName;
+    Coordinate coordStart;
+    UInt16 screenX = 0;
+    UInt16 screenY = 0;
+    UInt16 offsetX = 0;
+    UInt16 offsetY = 0;
+    float scale = 1;
     private void HandleMapSelection((string Uri, string Name) selection)
     {
+        selectedUri = selection.Uri;
+        selectedName = selection.Name;
         Console.WriteLine($"Map selected: {selection.Name} ({selection.Uri})");
         // You can now load the map, update UI, etc.
     }
+
+    private void HandleMapClick((Coordinate coordinate, UInt16 screenX, UInt16 screenY) coordinates)
+    {
+        coordStart = coordinates.coordinate;
+        screenX = coordinates.screenX;
+        screenY = coordinates.screenY;
+        Console.WriteLine($"Clicked on: x:{coordinates.coordinate.X} y: {coordinates.coordinate.Y}!");
+    }
+
+    private void HandleMapMove((UInt16 X, UInt16 Y) offset)
+    {
+        offsetX = offset.X;
+        offsetY = offset.Y;
+    }
+
 }
 
