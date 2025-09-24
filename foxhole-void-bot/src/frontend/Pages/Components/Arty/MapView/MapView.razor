@@ -18,7 +18,7 @@
              style="width:100%; height:100%; display:block;"
              draggable="false"
              @onclick="HandleClick" />
-        <MapMarker X="300" Y="300" scale="@scale" />
+        <MapMarker X="@originX" Y="@originY" scale="@scale" />
     </div>
 </div>
 
@@ -43,6 +43,8 @@
 
     private string ContainerStyle =>
     $"cursor: {(isPanning ? "grabbing" : "default")};";
+    private UInt16 originX = 0;
+    private UInt16 originY = 0;
 
     protected override void OnParametersSet()
     {
@@ -108,7 +110,8 @@
             X = (ushort)Math.Clamp(pixelX, 0, ImageWidth),
             Y = (ushort)Math.Clamp(pixelY, 0, ImageHeight)
         };
-
+        originX = (UInt16)e.OffsetX;
+        originY = (UInt16)e.OffsetY;
         await OnImageClick.InvokeAsync((coord, (UInt16)e.OffsetX, (UInt16)e.OffsetY ));
     }
 

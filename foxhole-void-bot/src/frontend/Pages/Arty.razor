@@ -8,23 +8,12 @@
 {
     
         <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" />
-
-        @if (screenX != 0 || screenY != 0)
-        {
-            <MapMarker X="@screenX" Y="@screenY" offsetX="@offsetX" offsetY="@offsetY" scale="@scale" />
-        }
 }
 
 @code {
     private double metersPerPixel = 1900 / 1776; 
     private string selectedUri;
-    private string selectedName;
-    Coordinate coordStart;
-    UInt16 screenX = 0;
-    UInt16 screenY = 0;
-    UInt16 offsetX = 0;
-    UInt16 offsetY = 0;
-    float scale = 1;
+    private string selectedName;    
     private void HandleMapSelection((string Uri, string Name) selection)
     {
         selectedUri = selection.Uri;
@@ -35,16 +24,13 @@
 
     private void HandleMapClick((Coordinate coordinate, UInt16 screenX, UInt16 screenY) coordinates)
     {
-        coordStart = coordinates.coordinate;
-        screenX = coordinates.screenX;
-        screenY = coordinates.screenY;
+      
         Console.WriteLine($"Clicked on: x:{coordinates.coordinate.X} y: {coordinates.coordinate.Y}!");
     }
 
     private void HandleMapMove((UInt16 X, UInt16 Y) offset)
     {
-        offsetX = offset.X;
-        offsetY = offset.Y;
+       
     }
 
 }

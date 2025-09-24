@@ -1,4 +1,5 @@
-﻿<div class="map-marker" style="@Style"></div>
+﻿@using System.Globalization
+<div class="map-marker" style="@Style"></div>
 
 @code {
     [Parameter] public double X { get; set; } // screen-space X
@@ -7,5 +8,5 @@
     [Parameter] public double offsetY { get; set; } // optional offset
     [Parameter] public double scale { get; set; }
     private string Style =>
-        $"left:{X}px; top:{Y}px;";
+        $"left:{X}px; top:{Y}px; scale({scale.ToString("F2", CultureInfo.InvariantCulture)}, {scale.ToString("F2", CultureInfo.InvariantCulture)})  ;";
 }

@@ -59,3 +59,5 @@ nunit-*.xml
 /foxhole-void-bot/src/.env
 foxhole-void-bot/.env
 /.vs/foxhole-void/CopilotIndices/17.14.1147.5054
+/.vs/
+/.vs/foxhole-void/CopilotIndices/17.14.1204.46620/SemanticSymbols.db
