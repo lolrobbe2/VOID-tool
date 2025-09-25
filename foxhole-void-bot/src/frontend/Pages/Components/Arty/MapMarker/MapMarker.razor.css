@@ -1,9 +1,6 @@
 ﻿.map-marker {
     position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: #ff3b3b; /* bright red */
-    border: 2px solid white; /* contrast ring */
+
     border-radius: 50%;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.5); /* subtle glow */
     pointer-events: none;

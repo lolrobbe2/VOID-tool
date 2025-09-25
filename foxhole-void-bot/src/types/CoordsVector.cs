@@ -16,6 +16,11 @@ namespace FoxholeBot.types
         {
             return new Coordinate() { X = (ushort)(a.X - b.X), Y = (ushort)(a.Y - b.Y) };
         }
+
+        public bool IsNull()
+        {
+            return X == 0 && Y == 0;
+        }
     }
     public class CoordsVector
     {

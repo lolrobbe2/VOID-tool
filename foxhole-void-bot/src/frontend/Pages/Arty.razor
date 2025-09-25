@@ -6,8 +6,7 @@
 <MapSelect OnMapSelected="@HandleMapSelection" />
 @if (!string.IsNullOrEmpty(selectedUri))
 {
-    
-        <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" />
+    <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" />
 }
 
 @code {

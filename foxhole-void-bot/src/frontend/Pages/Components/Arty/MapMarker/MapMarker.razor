@@ -2,11 +2,11 @@
 <div class="map-marker" style="@Style"></div>
 
 @code {
-    [Parameter] public double X { get; set; } // screen-space X
-    [Parameter] public double Y { get; set; } // screen-space Y
-    [Parameter] public double offsetX { get; set; } // optional offset
-    [Parameter] public double offsetY { get; set; } // optional offset
+    [Parameter] public double X { get; set; } // relative X
+    [Parameter] public double Y { get; set; } // relative Y
     [Parameter] public double scale { get; set; }
+    [Parameter] public string Color { get; set; } = "green"; // default color #ff3b3b
+
     private string Style =>
-        $"left:{X}px; top:{Y}px; scale({scale.ToString("F2", CultureInfo.InvariantCulture)}, {scale.ToString("F2", CultureInfo.InvariantCulture)})  ;";
+        $"left:{X}px; top:{Y}px; background-color:{Color};width: {(12 / scale).ToString("F2", CultureInfo.InvariantCulture)}px; height: {(12 / scale).ToString("F2", CultureInfo.InvariantCulture)}px; border: {(2 / scale).ToString("F2", CultureInfo.InvariantCulture)}px solid white;";
 }

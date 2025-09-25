@@ -3,6 +3,7 @@
 @using System.Globalization
 @using Microsoft.JSInterop
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapMarker
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapLine
 
 <div class="map-view"
      style="@ContainerStyle"
@@ -18,7 +19,15 @@
              style="width:100%; height:100%; display:block;"
              draggable="false"
              @onclick="HandleClick" />
-        <MapMarker X="@originX" Y="@originY" scale="@scale" />
+             @if(!start.IsNull()){
+                <MapMarker X="@start.X" Y="@start.Y" scale="@scale" />
+             }
+            @if (!end.IsNull())
+            {
+                <MapMarker X="@end.X" Y="@end.Y" scale="@scale" Color="red"/>
+                <MapLine X="@start.X" Y="@start.Y" X2="@end.X" Y2="@end.Y" scale="@scale" />
+            }
+
     </div>
 </div>
 
@@ -31,6 +40,8 @@
     [Parameter] public EventCallback<(UInt16, UInt16)> OnMove { get; set; }
     [Parameter] public int ImageWidth { get; set; } = 2048;
     [Parameter] public int ImageHeight { get; set; } = 1776;
+    [Inject] private IJSRuntime JS { get; set; }
+
     private string lastUri;
     private double scale = 1.0;
     private double offsetX = 0;
@@ -43,8 +54,9 @@
 
     private string ContainerStyle =>
     $"cursor: {(isPanning ? "grabbing" : "default")};";
-    private UInt16 originX = 0;
-    private UInt16 originY = 0;
+
+    private Coordinate start;
+    private Coordinate end;
 
     protected override void OnParametersSet()
     {
@@ -95,7 +107,6 @@
             OnMove.InvokeAsync(((UInt16)offsetX, (UInt16)offsetY));
         }
     }
-    [Inject] private IJSRuntime JS { get; set; }
 
     private async Task HandleClick(MouseEventArgs e)
     {
@@ -110,8 +121,13 @@
             X = (ushort)Math.Clamp(pixelX, 0, ImageWidth),
             Y = (ushort)Math.Clamp(pixelY, 0, ImageHeight)
         };
-        originX = (UInt16)e.OffsetX;
-        originY = (UInt16)e.OffsetY;
+        if(start.IsNull() || e.CtrlKey) {
+            start.X = (UInt16)e.OffsetX;
+            start.Y = (UInt16)e.OffsetY;
+        } else {
+            end.X = (UInt16)e.OffsetX;
+            end.Y = (UInt16)e.OffsetY;
+        }
         await OnImageClick.InvokeAsync((coord, (UInt16)e.OffsetX, (UInt16)e.OffsetY ));
     }
 
