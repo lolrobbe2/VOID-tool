@@ -1,0 +1,67 @@
+﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components.Web
+
+<svg viewBox="0 0 200 200" class="compass" @onclick="HandleClick">
+    <circle cx="100" cy="100" r="90" stroke="white" stroke-width="2" fill="#2a2a2a" />
+    @((MarkupString)TextElementsMarkup)
+    @if (SelectedPoint is not null)
+    {
+        <line x1="100" y1="100" x2="@SelectedPoint.Value.X" y2="@SelectedPoint.Value.Y"
+              stroke="red" stroke-width="2" stroke-linecap="round" />
+    }
+</svg>
+
+@code {
+    [Parameter] public EventCallback<WindDirection> OnDirectionSelected { get; set; }
+
+    private WindDirection? Selected;
+    private (double X, double Y)? SelectedPoint;
+
+    private record DirPoint(WindDirection Direction, double X, double Y);
+
+    private List<DirPoint> Points = Enum.GetValues<WindDirection>()
+        .Select(d =>
+        {
+            var deg = (double)d;
+            var rad = deg * Math.PI / 180.0;
+            var r = 80.0;
+            var cx = 100.0;
+            var cy = 100.0;
+            var x = cx + r * Math.Sin(rad);
+            var y = cy - r * Math.Cos(rad);
+            return new DirPoint(d, x, y);
+        }).ToList();
+
+    private string TextElementsMarkup => string.Join("",
+        Points.Select(p =>
+            $"<text x=\"{p.X:F2}\" y=\"{p.Y:F2}\" text-anchor=\"middle\" dominant-baseline=\"middle\" " +
+            $"class=\"compass-label{(Selected == p.Direction ? " selected" : "")}\">{Label(p.Direction)}</text>"
+        ));
+
+    private string Label(WindDirection d) => d.ToString().Replace('_', ' ');
+
+    private void HandleClick(MouseEventArgs e)
+    {
+        var cx = 100.0;
+        var cy = 100.0;
+        var dx = e.OffsetX - cx;
+        var dy = e.OffsetY - cy;
+
+        var angleDeg = (Math.Atan2(dy, dx) * 180.0 / Math.PI + 90.0 + 360.0) % 360.0;
+
+        var best = Points
+            .Select(p => (Point: p, Dist: AngularDistance(angleDeg, (double)p.Direction)))
+            .OrderBy(x => x.Dist)
+            .First();
+
+        Selected = best.Point.Direction;
+        SelectedPoint = (best.Point.X, best.Point.Y);
+        _ = OnDirectionSelected.InvokeAsync(Selected.Value);
+    }
+
+    private static double AngularDistance(double a, double b)
+    {
+        var diff = Math.Abs(a - b) % 360.0;
+        return diff > 180.0 ? 360.0 - diff : diff;
+    }
+}

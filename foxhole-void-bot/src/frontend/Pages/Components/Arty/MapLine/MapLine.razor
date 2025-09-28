@@ -1,13 +1,12 @@
-﻿<svg class="map-line-svg" style="@Style">
-    <line x1="@X" y1="@Y" x2="@X2" y2="@Y2"
+﻿@using FoxholeBot.types
+<svg class="map-line-svg" style="@Style">
+    <line x1="@start.X" y1="@start.Y" x2="@end.X" y2="@end.Y"
           stroke="@Color" stroke-width="@StrokeWidth" />
 </svg>
 
 @code {
-    [Parameter] public double X { get; set; }
-    [Parameter] public double Y { get; set; }
-    [Parameter] public double X2 { get; set; }
-    [Parameter] public double Y2 { get; set; }
+    [Parameter] public Coordinate start { get; set; }
+    [Parameter] public Coordinate end { get; set; }
     [Parameter] public double scale { get; set; }
     [Parameter] public string Color { get; set; } = "#ff3b3b";
 

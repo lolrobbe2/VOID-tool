@@ -1,0 +1,23 @@
+﻿.bottom-panel {
+    position: absolute;
+    top: 90%;
+    left: 25%;
+    width: 50%;
+    height: -webkit-fill-available;
+    background-color: #2a2a2a;
+    border-left: 2px solid white;
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.map-name {
+    margin: 0;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    color: #7a5c3c;
+    font-weight: bold;
+    font-size: medium;
+}

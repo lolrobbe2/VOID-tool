@@ -1,0 +1,17 @@
+﻿.compass {
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+}
+
+.compass-label {
+    fill: white;
+    font-size: 14px;
+    user-select: none;
+    pointer-events: none;
+}
+
+    .compass-label.selected {
+        fill: red;
+        font-weight: bold;
+    }

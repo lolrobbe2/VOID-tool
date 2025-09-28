@@ -1,0 +1,9 @@
+﻿@using foxhole_void_bot.src.frontend.Pages.Components.Arty.Compass
+<div class="bottom-panel">
+    <p class="map-name">@MapName</p>
+    <Compass />
+</div>
+
+@code {
+    [Parameter] public string MapName { get; set; } = "hello";
+}

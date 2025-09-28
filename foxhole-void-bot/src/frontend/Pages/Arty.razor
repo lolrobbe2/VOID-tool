@@ -3,12 +3,14 @@
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapMarker
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapSelect
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapView
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.BottomPanel
+
 <MapSelect OnMapSelected="@HandleMapSelection" />
 @if (!string.IsNullOrEmpty(selectedUri))
 {
     <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" />
 }
-
+<BottomPanel MapName="@selectedName" />
 @code {
     private double metersPerPixel = 1900 / 1776; 
     private string selectedUri;

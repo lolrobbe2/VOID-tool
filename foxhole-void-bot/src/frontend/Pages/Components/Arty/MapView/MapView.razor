@@ -20,12 +20,12 @@
              draggable="false"
              @onclick="HandleClick" />
              @if(!start.IsNull()){
-                <MapMarker X="@start.X" Y="@start.Y" scale="@scale" />
+                <MapMarker coords="@start" scale="@scale" />
              }
             @if (!end.IsNull())
             {
-                <MapMarker X="@end.X" Y="@end.Y" scale="@scale" Color="red"/>
-                <MapLine X="@start.X" Y="@start.Y" X2="@end.X" Y2="@end.Y" scale="@scale" />
+                <MapMarker coords="@end" scale="@scale" Color="red" />
+                <MapLine start="@start" end="@end" scale="@scale" />
             }
 
     </div>
@@ -40,7 +40,6 @@
     [Parameter] public EventCallback<(UInt16, UInt16)> OnMove { get; set; }
     [Parameter] public int ImageWidth { get; set; } = 2048;
     [Parameter] public int ImageHeight { get; set; } = 1776;
-    [Inject] private IJSRuntime JS { get; set; }
 
     private string lastUri;
     private double scale = 1.0;
@@ -55,8 +54,8 @@
     private string ContainerStyle =>
     $"cursor: {(isPanning ? "grabbing" : "default")};";
 
-    private Coordinate start;
-    private Coordinate end;
+    private Coordinate start = new Coordinate();
+    private Coordinate end = new Coordinate();
 
     protected override void OnParametersSet()
     {
@@ -107,6 +106,7 @@
             OnMove.InvokeAsync(((UInt16)offsetX, (UInt16)offsetY));
         }
     }
+     [Inject] private IJSRuntime JS { get; set; }
 
     private async Task HandleClick(MouseEventArgs e)
     {
