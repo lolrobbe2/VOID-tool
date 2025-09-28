@@ -1,17 +1,52 @@
-﻿.compass {
-    width: 200px;
-    height: 200px;
+﻿/* container (block-level): rem-based */
+.wind-dial {
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: block;
+    z-index: 10;
+    overflow: visible;
+}
+
+/* point (absolute inside container) */
+.compass-point {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
-}
-
-.compass-label {
-    fill: white;
-    font-size: 14px;
     user-select: none;
-    pointer-events: none;
+    border: 0.125rem solid #222;
+    box-sizing: border-box;
 }
 
-    .compass-label.selected {
-        fill: red;
-        font-weight: bold;
+    /* font-size: clamp using rems (block-level font sizing) */
+    .compass-point .compass-label {
+        /* inline element: use em if you want relative scaling; but the parent is block so we use rem in clamp */
+        font-size: clamp(0.75rem, 1.8vw, 1.0rem);
+        line-height: 1em;
+        font-weight: 600;
+        text-align: center;
+        /* stack two-letter labels vertically (keeps glyphs upright) */
+        text-orientation: upright;
+        -webkit-text-orientation: upright;
     }
+
+    /* active point */
+    .compass-point.active {
+        background-color: lime;
+    }
+
+/* SVG overlay doesn't block pointer events and is positioned with top/left in markup */
+.compass-svg {
+    display: block;
+    z-index:-1;
+}
+
+/* focus/keyboard */
+.compass-point:focus {
+    outline: 0.125rem solid #66f;
+    outline-offset: 0.125rem;
+}

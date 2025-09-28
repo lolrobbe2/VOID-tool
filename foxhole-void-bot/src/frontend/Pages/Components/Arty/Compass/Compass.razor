@@ -1,67 +1,103 @@
 ﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
+@using System.Globalization
 
-<svg viewBox="0 0 200 200" class="compass" @onclick="HandleClick">
-    <circle cx="100" cy="100" r="90" stroke="white" stroke-width="2" fill="#2a2a2a" />
-    @((MarkupString)TextElementsMarkup)
-    @if (SelectedPoint is not null)
+<div class="wind-dial"
+     style="position:absolute; bottom:@($"{BottomOffset}%"); left:@($"{LeftOffset}%"); width:@($"{Size}rem"); height:@($"{Size}rem");">
+    @foreach (CompassPoint point in CompassPoints)
     {
-        <line x1="100" y1="100" x2="@SelectedPoint.Value.X" y2="@SelectedPoint.Value.Y"
-              stroke="red" stroke-width="2" stroke-linecap="round" />
+        double rad = (point.RenderAngle - 90.0) * Math.PI / 180.0;
+        double r = Size * 0.35;
+        double center = Size / 2.0;
+        double x = center + r * Math.Cos(rad);
+        double y = center + r * Math.Sin(rad);
+        double pointSize = PointSizeRem;
+        double left = x - (pointSize / 2.0);
+        double top = y - (pointSize / 2.0);
+
+            <div class="compass-point @(Direction == point.Direction ? "active" : "")"
+                 style="position: absolute;
+                    left:@(left.ToString("F3", CultureInfo.InvariantCulture))rem;
+                    top:@(top.ToString("F3", CultureInfo.InvariantCulture))rem;
+                    width:@(pointSize.ToString("F3", CultureInfo.InvariantCulture))rem;
+                    height:@(pointSize.ToString("F3", CultureInfo.InvariantCulture))rem;"
+                 @onclick="() => HandleClick(point.Direction)"
+                 role="button"
+                 aria-label="@($"Select {point.Label}")">
+                <span class="compass-label">@point.Label</span>
+            </div>
     }
-</svg>
+
+    <!-- SVG arrow overlay (pointer-events:none so it doesn't block clicks on points) -->
+    <svg class="compass-svg"
+         width="100%"
+         height="100%"
+         viewBox="0 0 @(Size.ToString(CultureInfo.InvariantCulture)) @(Size.ToString(CultureInfo.InvariantCulture))"
+         style="position:absolute; top:0; left:0; pointer-events:none;"
+         xmlns="http://www.w3.org/2000/svg">
+        <line x1="@( (Size / 2.0).ToString("F3", CultureInfo.InvariantCulture))"
+              y1="@( (Size / 2.0).ToString("F3", CultureInfo.InvariantCulture))"
+              x2="@(ComputeArrowX(Size).ToString("F3", CultureInfo.InvariantCulture))"
+              y2="@(ComputeArrowY(Size).ToString("F3", CultureInfo.InvariantCulture))"
+              stroke="lime"
+              stroke-width="0.25"
+              stroke-linecap="round" />
+    </svg>
+</div>
 
 @code {
-    [Parameter] public EventCallback<WindDirection> OnDirectionSelected { get; set; }
+    [Parameter] public EventCallback<WindDirection> OnChange { get; set; }
+    [Parameter] public double Size { get; set; } = 8.0; // rem
+    [Parameter] public double LeftOffset { get; set; } = 30; // rem
+    [Parameter] public double BottomOffset { get; set; } = 85; // rem
 
-    private WindDirection? Selected;
-    private (double X, double Y)? SelectedPoint;
+    private WindDirection Direction { get; set; } = 0;
 
-    private record DirPoint(WindDirection Direction, double X, double Y);
+    // point diameter in rem
+    private double PointSizeRem { get; } = 2.0;
 
-    private List<DirPoint> Points = Enum.GetValues<WindDirection>()
-        .Select(d =>
-        {
-            var deg = (double)d;
-            var rad = deg * Math.PI / 180.0;
-            var r = 80.0;
-            var cx = 100.0;
-            var cy = 100.0;
-            var x = cx + r * Math.Sin(rad);
-            var y = cy - r * Math.Cos(rad);
-            return new DirPoint(d, x, y);
-        }).ToList();
+    private record CompassPoint(string Label, WindDirection Direction, int RenderAngle);
 
-    private string TextElementsMarkup => string.Join("",
-        Points.Select(p =>
-            $"<text x=\"{p.X:F2}\" y=\"{p.Y:F2}\" text-anchor=\"middle\" dominant-baseline=\"middle\" " +
-            $"class=\"compass-label{(Selected == p.Direction ? " selected" : "")}\">{Label(p.Direction)}</text>"
-        ));
-
-    private string Label(WindDirection d) => d.ToString().Replace('_', ' ');
-
-    private void HandleClick(MouseEventArgs e)
+    private static readonly CompassPoint[] CompassPoints = new[]
     {
-        var cx = 100.0;
-        var cy = 100.0;
-        var dx = e.OffsetX - cx;
-        var dy = e.OffsetY - cy;
+        new CompassPoint("N", WindDirection.N, 0),
+        new CompassPoint("NE", WindDirection.NE, 45),
+        new CompassPoint("E", WindDirection.E, 90),
+        new CompassPoint("SE", WindDirection.SE, 135),
+        new CompassPoint("S", WindDirection.S, 180),
+        new CompassPoint("SW", WindDirection.SW, 225),
+        new CompassPoint("W", WindDirection.W, 270),
+        new CompassPoint("NW", WindDirection.NW, 315),
+    };
 
-        var angleDeg = (Math.Atan2(dy, dx) * 180.0 / Math.PI + 90.0 + 360.0) % 360.0;
-
-        var best = Points
-            .Select(p => (Point: p, Dist: AngularDistance(angleDeg, (double)p.Direction)))
-            .OrderBy(x => x.Dist)
-            .First();
-
-        Selected = best.Point.Direction;
-        SelectedPoint = (best.Point.X, best.Point.Y);
-        _ = OnDirectionSelected.InvokeAsync(Selected.Value);
+    private async Task HandleClick(WindDirection angle)
+    {
+        Direction = angle;
+        if (OnChange.HasDelegate)
+        {
+            await OnChange.InvokeAsync(angle);
+        }
     }
 
-    private static double AngularDistance(double a, double b)
+    // Arrow endpoint calculations (no CSS transform — coordinates computed here)
+    private double ComputeArrowX(double size)
     {
-        var diff = Math.Abs(a - b) % 360.0;
-        return diff > 180.0 ? 360.0 - diff : diff;
+        double center = size / 2.0;
+        double rArrow = size * 0.3;
+        double renderAngle = (360.0 - (double)Direction) % 360.0;
+        double rad = (renderAngle - 90.0) * Math.PI / 180.0;
+        double x = center + rArrow * Math.Cos(rad);
+        return x;
+    }
+
+    private double ComputeArrowY(double size)
+    {
+        double center = size / 2.0;
+        double rArrow = size * 0.3;
+        double renderAngle = (360.0 - (double)Direction) % 360.0;
+        double rad = (renderAngle - 90.0) * Math.PI / 180.0;
+        double y = center + rArrow * Math.Sin(rad);
+        return y;
     }
 }

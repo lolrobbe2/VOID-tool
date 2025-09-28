@@ -19,5 +19,15 @@ namespace FoxholeBot.Controllers
         {
             return Ok(AssetRepository.GetMapImages());
         }
+        [HttpGet("Wind/Flag")]
+        public IActionResult GetFlags()
+        {
+            return Ok(AssetRepository.GetFlagGifs());
+        }
+        [HttpGet("Wind/Sock")]
+        public IActionResult GetWindSocks()
+        {
+            return Ok(AssetRepository.GetWindSockGifs());
+        }
     }
 }

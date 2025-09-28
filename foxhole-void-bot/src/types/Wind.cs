@@ -7,14 +7,14 @@ namespace FoxholeBot.types
     /// </summary>
     public enum WindDirection : UInt16
     {
-        NORTH = 0,
-        NORTH_EAST = 45,
-        EAST = 90,
-        SOUTH_EAST = 135,
-        SOUTH = 180, 
-        SOUTH_WEST = 225,
-        WEST = 270,
-        NORTH_WEST = 315,
+        N = 0,
+        NE = 315,
+        E = 270,
+        SE = 225,
+        S = 180, 
+        SW = 135,
+        W = 90,
+        NW = 45,
     }
 
     public enum WindStrenght : byte

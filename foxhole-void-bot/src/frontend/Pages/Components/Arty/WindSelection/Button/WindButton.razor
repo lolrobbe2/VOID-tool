@@ -1,0 +1,11 @@
+﻿<div class="image-button-container">
+    <button class="image-button" @onclick="OnClick">
+        <img src="@Src" alt="@Alt" class="image-button-img" />
+    </button>
+</div>
+
+@code {
+    [Parameter] public string Src { get; set; } = string.Empty;
+    [Parameter] public string Alt { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClick { get; set; }
+}

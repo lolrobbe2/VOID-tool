@@ -10,15 +10,15 @@ namespace FoxholeBot.repositories
         }
         public static string[] GetAssetFileLinks(string folder, string[] files)
         {
-           return files.Select(file => GetAssetFolderLink(folder, file)).ToArray();
+            return files.Select(file => GetAssetFolderLink(folder, file)).ToArray();
         }
         public static string[] GetCarouselVideos()
         {
-           string[] files = [
-                "demo1.webm",
+            string[] files = [
+                 "demo1.webm",
                 "demo2.webm"
-                ];
-           return GetAssetFileLinks("videos",files);
+                 ];
+            return GetAssetFileLinks("videos", files);
         }
 
         public static string[] GetMapImages()
@@ -48,6 +48,29 @@ namespace FoxholeBot.repositories
             ];
             return GetAssetFileLinks("map", files);
 
+        }
+
+        public static string[] GetFlagGifs()
+        {
+            string[] files = [
+                "WindFlagAnim1.gif",
+                "WindFlagAnim2.gif",
+                "WindFlagAnim3.gif",
+                "WindFlagAnim4.gif",
+                "WindFlagAnim5.gif",
+                ];
+            return GetAssetFileLinks("arty/wind/flag", files);
+        }
+
+        public static string[] GetWindSockGifs()
+        {
+            string[] files = [
+                "WindSockAnim1.gif",
+                "WindSockAnim2.gif",
+                "WindSockAnim3.gif",
+                "WindSockAnim4.gif",
+                ];
+            return GetAssetFileLinks("arty/wind/windsock", files);
         }
     }
 }
