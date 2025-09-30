@@ -1,9 +1,4 @@
-﻿.image-button-container {
-    width: 6rem; /* container size */
-    height: 6rem; /* adjust as needed */
-    display: inline-block;
-    position: relative;
-}
+﻿
 
 .image-button {
     width: 100%;
@@ -15,12 +10,42 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
 }
 
 .image-button-img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    pointer-events: none; /* ensures button receives the clicks */
+    width: 100%; /* responsive width */
+    height: 100%; /* responsive height */
+    object-fit: contain; /* keep aspect ratio inside box */
+    object-position: center; /* center the image inside */
+    display: block;
+    pointer-events:none;    
+}
+
+.image-button-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 20%;
+    width:100%;
+}
+.image-button:hover {
+    background-color: #4a5c4d;
+    color: #2a2a2a;
+}
+    .image-button:hover p {
+        background-color: #4a5c4d;
+        color: #2a2a2a;
+    }
+    .image-button-container p {
+        color: #7a5c3c;
+        font-weight: bold;
+        font-size: medium;
+    }
+.image-container {
+    width: 5em;
+    height: 5em;
+    object-fit: fill;
+    margin-right: 1em;
+    margin-left: 1em;
 }

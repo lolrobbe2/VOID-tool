@@ -1,4 +1,7 @@
-﻿<div class="gun-select">
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+<div class="gun-select">
     @foreach (var gun in Guns)
     {
         <button class="gun-button" @onclick="@(() => OnGunSelected.InvokeAsync(gun))">

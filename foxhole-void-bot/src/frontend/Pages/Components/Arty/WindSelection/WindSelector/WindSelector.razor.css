@@ -1,1 +1,35 @@
-﻿
+﻿.wind-selector {
+    width: 12.5%;
+    height: 50%;
+    position: absolute;
+    top: 50%;
+    left: 75%;
+    border-left: 2px solid white;
+    background-color: #2a2a2a;
+}
+.selector-controls {
+    display: flex;
+    height: 10%
+}
+    .selector-controls button {
+        width: 50%;
+        border: none;
+        color: #7a5c3c;
+        font-weight: bold;
+        font-size: medium;
+        background-color: #2a2a2a;
+    }
+        .selector-controls button:hover {
+            color: #2a2a2a !important;
+            width: 50%;
+            background-color: #4a5c4d !important;
+        }
+.active {
+    color: #2a2a2a !important;
+    font-weight: bold;
+    font-size: medium;
+    background-color: #7a5c3c !important;
+}
+.selector-view {
+    height: 90%;
+}

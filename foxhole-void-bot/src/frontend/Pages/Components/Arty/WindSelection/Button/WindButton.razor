@@ -1,7 +1,12 @@
 ﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
 <div class="image-button-container">
-    <button class="image-button" @onclick="HandleClick">
-        <img src="@Src" alt="@Enum.GetName(Strenght)" class="image-button-img" />
+    <button class="image-button" @onclick="(()=>HandleClick())">
+        <div class="image-container">
+            <img src="@Src" alt="@Enum.GetName(Strenght)" class="image-button-img" />
+        </div>
         <p>@Enum.GetName(Strenght)</p> 
     </button>
 </div>
@@ -10,10 +15,13 @@
     [Parameter] public string Src { get; set; } = string.Empty;
     [Parameter] public WindStrenght Strenght { get; set; }
     [Parameter] public EventCallback<WindStrenght> OnClick { get; set; }
+
     private async Task HandleClick()
     {
-        if(OnClick.HasDelegate){
+        if (OnClick.HasDelegate)
+        {
             await OnClick.InvokeAsync(Strenght);
         }
     }
 }
+
