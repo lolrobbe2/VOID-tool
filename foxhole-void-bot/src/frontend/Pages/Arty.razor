@@ -5,6 +5,7 @@
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapSelect
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapView
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.BottomPanel
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection.WindSelector
 
 <MapSelect OnMapSelected="@HandleMapSelection" />
 @if (!string.IsNullOrEmpty(selectedUri))
@@ -13,11 +14,15 @@
 }
 <BottomPanel MapName="@selectedName" />
 <Compass />
-
+<WindSelector OnWindSelectedCallBack="@OnWindSelected"/>
 @code {
     private double metersPerPixel = 1900 / 1776; 
     private string selectedUri;
-    private string selectedName;    
+    private string selectedName;
+    private async Task OnWindSelected(WindStrenght strength)
+    {
+        
+    }
     private void HandleMapSelection((string Uri, string Name) selection)
     {
         selectedUri = selection.Uri;

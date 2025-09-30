@@ -1,0 +1,58 @@
+﻿@using FoxholeBot.types
+@using Microsoft.JSInterop
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection.Button
+@inject IJSRuntime JS
+<div class="wind-flags">
+    @if (windFlags is null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        @foreach (var kvp in windFlags)
+        {
+            <WindButton Src="@kvp.Value" Name="@kvp.Key.ToString()" OnClick="@(() => HandleClick(kvp.Key))" />
+        }
+    }
+</div>
+
+@code {
+    private Dictionary<WindStrenght, string>? windFlags;
+
+    [Parameter]
+    public EventCallback<WindStrenght> OnWindSelected { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) {
+            string[] gifs = await JS.InvokeAsync<string[]>("fetchFlagUrls");
+
+            if (gifs is null)
+                return;
+
+            windFlags = Enum.GetValues<WindStrenght>()
+                            .Zip(gifs, (strength, gif) => new { strength, gif })
+                            .ToDictionary(x => x.strength, x => x.gif);
+        }
+    }
+
+    private async Task HandleClick(WindStrenght strength)
+    {
+        if (OnWindSelected.HasDelegate)
+        {
+            await OnWindSelected.InvokeAsync(strength);
+        }
+    }
+}
+<script>
+    window.fetchFlagUrls = async function () {
+        try {
+            const response = await fetch('/api/Assets/Wind/Flag');
+            if (!response.ok) throw new Error('Failed to fetch flag URLs');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching flag URLs:', error);
+            return [];
+        }
+    };
+</script>

@@ -1,0 +1,56 @@
+﻿@using FoxholeBot.types
+@using Microsoft.JSInterop
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection.WindFlagSelector
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection.WindSockSelector
+
+
+<div class="wind-selector">
+    <div class="selector-controls">
+        <button @onclick="() => SwitchMode(SelectorMode.Flag)"
+                class="@(CurrentMode == SelectorMode.Flag ? "active" : "")">
+            Flags
+        </button>
+        <button @onclick="() => SwitchMode(SelectorMode.Sock)"
+                class="@(CurrentMode == SelectorMode.Sock ? "active" : "")">
+            Socks
+        </button>
+    </div>
+
+    <div class="selector-view">
+        @if (CurrentMode == SelectorMode.Flag)
+        {
+            <WindFlagSelector OnWindSelected="OnWindSelected" />
+        }
+        else if (CurrentMode == SelectorMode.Sock)
+        {
+            <WindSockSelector OnWindSelected="OnWindSelected" />
+        }
+    </div>
+</div>
+
+@code {
+    private SelectorMode CurrentMode { get; set; } = SelectorMode.Flag;
+
+    [Parameter]
+    public EventCallback<WindStrenght> OnWindSelectedCallBack { get; set; }
+
+    private void SwitchMode(SelectorMode mode)
+    {
+        CurrentMode = mode;
+    }
+
+    private async Task OnWindSelected(WindStrenght strength)
+    {
+        if (OnWindSelectedCallBack.HasDelegate)
+        {
+            await OnWindSelectedCallBack.InvokeAsync(strength);
+        }
+    }
+
+    private enum SelectorMode
+    {
+        Flag,
+        Sock
+    }
+}

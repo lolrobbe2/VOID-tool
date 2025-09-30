@@ -1,0 +1,61 @@
+﻿@using FoxholeBot.types
+@using Microsoft.JSInterop
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection.Button
+@inject IJSRuntime JS
+
+<div class="wind-socks">
+    @if (windSocks is null)
+    {
+            <p>Loading...</p>
+    }
+    else
+    {
+        @foreach (var kvp in windSocks)
+        {
+           <WindButton Src="@kvp.Value" Name="@kvp.Key.ToString()" OnClick="@HandleClick" />
+        }
+    }
+</div>
+
+@code {
+    private Dictionary<WindStrenght, string>? windSocks;
+
+    [Parameter]
+    public EventCallback<WindStrenght> OnWindSelected { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender) {
+            string[] gifs = await JS.InvokeAsync<string[]>("fetchSockUrls");
+
+            if (gifs is null || gifs.Length == 0)
+                return;
+
+            windSocks = Enum.GetValues<WindStrenght>()
+                            .Take(gifs.Length) // only map as many gifs as we got (4)
+                            .Zip(gifs, (strength, gif) => new { strength, gif })
+                            .ToDictionary(x => x.strength, x => x.gif);
+        }
+    }
+
+    private async Task HandleClick(WindStrenght strength)
+    {
+        if (OnWindSelected.HasDelegate)
+        {
+            await OnWindSelected.InvokeAsync(strength);
+        }
+    }
+}
+
+<script>
+    window.fetchSockUrls = async function () {
+        try {
+            const response = await fetch('/api/Assets/Wind/WindSock');
+            if (!response.ok) throw new Error('Failed to fetch windsock URLs');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching windsock URLs:', error);
+            return [];
+        }
+    };
+</script>
