@@ -1,6 +1,7 @@
 ﻿@page "/arty"
 @using FoxholeBot.types
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.Compass
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.GunSelect.GunFactionSelector
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapMarker
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapSelect
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapView
@@ -15,6 +16,7 @@
 <BottomPanel MapName="@selectedName" />
 <Compass />
 <WindSelector OnWindSelectedCallBack="@OnWindSelected"/>
+<GunFactionSelector />
 @code {
     private double metersPerPixel = 1900 / 1776; 
     private string selectedUri;

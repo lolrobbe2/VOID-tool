@@ -1,0 +1,45 @@
+﻿@using FoxholeBot.types
+@using Microsoft.JSInterop
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.GunSelect.GunButton
+@inject IJSRuntime JS
+<div class="gun-selector">
+    @if (guns is null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        @foreach (var gun in guns)
+        {
+            <GunButton Gun="gun" Selected="@selected" OnClick="HandleClick" Src="@GetSrc(gun)"/>
+        }
+    }
+</div>
+
+@code {
+    #nullable enable
+    [Parameter]
+    public string[] Urls { get; set; }
+    [Parameter]
+    public ArtyGun[] guns { get; set; }
+    [Parameter]
+    public EventCallback<ArtyGun> OnGunSelected { get; set; }
+    public ArtyGun? selected;
+
+    private async Task HandleClick(ArtyGun gun)
+    {
+        selected = gun;
+        if (OnGunSelected.HasDelegate)
+        {
+            await OnGunSelected.InvokeAsync(gun);
+        }
+    }
+    private string GetSrc(ArtyGun gun)
+    {
+        if(Urls is null)
+        {
+            return "";
+        }
+        return Urls.Where(url => url.EndsWith(gun.ImageName)).First();
+    }
+}

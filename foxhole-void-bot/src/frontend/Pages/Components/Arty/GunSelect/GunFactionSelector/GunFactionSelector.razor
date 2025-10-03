@@ -1,0 +1,79 @@
+﻿@using FoxholeBot.types
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.GunSelect.GunSelector
+@inject IJSRuntime JS
+
+<div class="gun-selector">
+    <div class="selector-controls">
+        <button @onclick="() => SwitchMode(Faction.COLONIAL)"
+                class="@(CurrentMode == Faction.COLONIAL ? "active" : "")">
+            Collonial
+        </button>
+        <button @onclick="() => SwitchMode(Faction.WARDEN)"
+                class="@(CurrentMode == Faction.WARDEN ? "active" : "")">
+            Warden
+        </button>
+    </div>
+
+    <div class="selector-view">
+        @if (CurrentMode == Faction.COLONIAL)
+        {
+            <GunSelector OnGunSelected="OnGunSelected" guns="CollonialGuns" Urls="CollonialUrls"/>
+        }
+        else if (CurrentMode == Faction.WARDEN)
+        {
+            <GunSelector OnGunSelected="OnGunSelected" guns="WardenGuns"/>
+        }
+    </div>
+</div>
+
+@code {
+    private Faction CurrentMode { get; set; } = Faction.COLONIAL;
+
+    [Parameter]
+    public EventCallback<ArtyGun> OnGunSelectedCallBack { get; set; }
+
+    private ArtyGun[] CollonialGuns = Guns.artyGuns.Where(gun => gun.Faction == Faction.COLONIAL).ToArray();
+
+    private ArtyGun[] WardenGuns = Guns.artyGuns.Where(gun => gun.Faction == Faction.WARDEN).ToArray();
+
+    private string[] CollonialUrls { get; set; }
+    private void SwitchMode(Faction mode)
+    {
+        CurrentMode = mode;
+    }
+
+    private async Task OnGunSelected(ArtyGun gun)
+    {
+        if (OnGunSelectedCallBack.HasDelegate)
+        {
+            await OnGunSelectedCallBack.InvokeAsync(gun);
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+           CollonialUrls = await JS.InvokeAsync<string[]>("fetchCollonialUrls");
+
+            StateHasChanged();
+
+        }
+    }
+}
+
+<script>
+    window.fetchCollonialUrls = async function () {
+        try {
+            const response = await fetch('/api/Assets/Arty/Collonial');
+            if (!response.ok) throw new Error('Failed to fetch windsock URLs');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching windsock URLs:', error);
+            return [];
+        }
+    };
+</script>

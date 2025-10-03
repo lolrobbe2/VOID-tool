@@ -1,0 +1,28 @@
+﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+<div class="image-button-container">
+    <button class="image-button @(Selected?.Name == Gun.Name ? "selected" : "")" @onclick="(() => HandleClick())">
+        <div class="image-container">
+            <img src="@Src" alt="@Gun.Name" class="image-button-img" />
+        </div>
+        <p>@Gun.Name</p>
+    </button>
+</div>
+
+@code {
+    [Parameter] public string Src { get; set; } = string.Empty;
+    [Parameter] public EventCallback<ArtyGun> OnClick { get; set; }
+    [Parameter] public ArtyGun Selected { get; set; }
+    [Parameter] public ArtyGun Gun { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(Gun);
+        }
+    }
+}
+
