@@ -72,5 +72,14 @@ namespace FoxholeBot.repositories
                 ];
             return GetAssetFileLinks("arty/wind/windsock", files);
         }
+
+        public static string[] GetCollonialArtilleryImages()
+        {
+            string[] files = [
+                "120-korindes.webp"
+                ];
+
+            return GetAssetFileLinks("arty/Gun/Collonial", files);
+        }
     }
 }

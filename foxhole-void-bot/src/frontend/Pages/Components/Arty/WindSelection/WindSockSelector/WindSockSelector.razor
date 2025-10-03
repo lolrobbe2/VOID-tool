@@ -12,13 +12,14 @@
     {
         @foreach (var kvp in windSocks)
         {
-            <WindButton Src="@kvp.Value" Strenght="@kvp.Key" OnClick="HandleClick" />
+            <WindButton Src="@kvp.Value" Selected="@selected" Strenght="@kvp.Key" OnClick="HandleClick" />
         }
     }
 </div>
 
 @code {
     private Dictionary<WindStrenght, string>? windSocks;
+    private WindStrenght selected = WindStrenght.CALM;
 
     [Parameter]
     public EventCallback<WindStrenght> OnWindSelected { get; set; }
@@ -35,11 +36,15 @@
                             .Take(gifs.Length) // only map as many gifs as we got (4)
                             .Zip(gifs, (strength, gif) => new { strength, gif })
                             .ToDictionary(x => x.strength, x => x.gif);
+            StateHasChanged();
+
         }
     }
 
     private async Task HandleClick(WindStrenght strength)
     {
+        selected = strength;
+
         if (OnWindSelected.HasDelegate)
         {
             await OnWindSelected.InvokeAsync(strength);
@@ -50,7 +55,7 @@
 <script>
     window.fetchSockUrls = async function () {
         try {
-            const response = await fetch('/api/Assets/Wind/WindSock');
+            const response = await fetch('/api/Assets/Wind/Sock');
             if (!response.ok) throw new Error('Failed to fetch windsock URLs');
             return await response.json();
         } catch (error) {

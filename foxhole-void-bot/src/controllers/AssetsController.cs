@@ -29,5 +29,11 @@ namespace FoxholeBot.Controllers
         {
             return Ok(AssetRepository.GetWindSockGifs());
         }
+
+        [HttpGet("Arty/Collonial")]
+        public IActionResult GetCollonialArty()
+        {
+            return Ok(AssetRepository.GetCollonialArtilleryImages());
+        }
     }
 }
