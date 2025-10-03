@@ -17,8 +17,9 @@
 </div>
 
 @code {
+    #nullable enable
     private Dictionary<WindStrenght, string>? windFlags;
-
+    private WindStrenght? selected;
     [Parameter]
     public EventCallback<WindStrenght> OnWindSelected { get; set; }
 
@@ -38,6 +39,7 @@
 
     private async Task HandleClick(WindStrenght strength)
     {
+        selected = strength;
         if (OnWindSelected.HasDelegate)
         {
             await OnWindSelected.InvokeAsync(strength);
