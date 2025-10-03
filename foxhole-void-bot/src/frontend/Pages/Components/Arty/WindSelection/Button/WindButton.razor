@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 <div class="image-button-container">
-    <button class="image-button" @onclick="(()=>HandleClick())">
+    <button class="image-button @(Selected == Strenght ? "selected" : "")" @onclick="(() => HandleClick())">
         <div class="image-container">
             <img src="@Src" alt="@Enum.GetName(Strenght)" class="image-button-img" />
         </div>
@@ -15,6 +15,7 @@
     [Parameter] public string Src { get; set; } = string.Empty;
     [Parameter] public WindStrenght Strenght { get; set; }
     [Parameter] public EventCallback<WindStrenght> OnClick { get; set; }
+    [Parameter] public WindStrenght Selected { get; set; }
 
     private async Task HandleClick()
     {

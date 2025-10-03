@@ -11,7 +11,7 @@
     {
         @foreach (var kvp in windFlags)
         {
-            <WindButton Src="@kvp.Value" Strenght="@kvp.Key" OnClick="HandleClick" />
+            <WindButton Src="@kvp.Value" Strenght="@kvp.Key" Selected="@selected" OnClick="HandleClick" />
         }
     }
 </div>
@@ -19,7 +19,7 @@
 @code {
     #nullable enable
     private Dictionary<WindStrenght, string>? windFlags;
-    private WindStrenght? selected;
+    private WindStrenght selected = WindStrenght.CALM;
     [Parameter]
     public EventCallback<WindStrenght> OnWindSelected { get; set; }
 
@@ -34,6 +34,7 @@
             windFlags = Enum.GetValues<WindStrenght>()
                             .Zip(gifs, (strength, gif) => new { strength, gif })
                             .ToDictionary(x => x.strength, x => x.gif);
+            StateHasChanged();
         }
     }
 
