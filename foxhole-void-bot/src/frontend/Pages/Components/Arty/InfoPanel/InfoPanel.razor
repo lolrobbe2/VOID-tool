@@ -1,0 +1,65 @@
+﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="info-panel">
+    @if(gun is null)
+    {
+       <p class="none-selected">No Gun Selected</p> 
+    } else {
+        <table class="info-table">
+            <thead colspan="3">
+                @gun.Name
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="empty-field"></td>
+                    <td>Min</td>
+                    <td>Max</td>
+                </tr>
+                <tr>
+                    <td>Distance</td>
+                    <td>@gun.MinRange m</td>
+                    <td>@gun.MaxRange m</td>
+                </tr>
+                <tr >
+                    <td colspan="3" class ="row-divider"></td>
+                </tr>
+                
+                <tr >
+                    <td>Wind Bias per level</td>
+                    <td colspan="2">@gun.Bias m</td>
+                </tr>
+                <tr>
+                    <td>Fire Rate</td>
+                    <td colspan="2">@gun.FireRate /min</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="row-divider"></td>
+                </tr>
+                <tr>
+                    <td class="empty-field"></td>
+                    <td>Min</td>
+                    <td>Max</td>
+                </tr>
+                <tr>
+                    <td>Accuracy</td>
+                    <td>@gun.InacuracyMin m</td>
+                    <td>@gun.InacuracyMax m</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="row-divider"></td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td colspan="2">@((UInt16)gun.Type) mm</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter] public ArtyGun gun { get; set; }
+}

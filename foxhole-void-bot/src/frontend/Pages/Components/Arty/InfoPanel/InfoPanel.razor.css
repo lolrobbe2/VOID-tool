@@ -1,0 +1,45 @@
+﻿.info-panel {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 75%;
+    width: 25%;
+    height: calc(50% - 2px);
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    background-color: #2a2a2a;
+}
+
+.none-selected {
+    width: 100%;
+    font-size: medium;
+    text-align: center;
+    border: 2px solid #7a5c3c;
+    color: #7a5c3c;
+}
+.info-table {
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    text-align: center;
+    border: 2px solid #7a5c3c;
+    color: #7a5c3c;
+    font-weight: bold;
+    border-spacing: 0px;
+}
+
+    .info-table thead {
+        border: 2px solid #7a5c3c;
+    }
+    .info-table td {
+        border-spacing: 0px;
+        border: 2px solid #7a5c3c;
+    }
+.empty-field {
+    background-color: #7a5c3c;
+}
+.row-divider {
+    border-top: 4px solid #7a5c3c;
+    background-color: #7a5c3c;
+    height: 2%;
+}

@@ -76,7 +76,13 @@ namespace FoxholeBot.repositories
         public static string[] GetCollonialArtilleryImages()
         {
             string[] files = [
-                "120-korindes.webp"
+                "120-korindes.webp",
+                "trident.webp",
+                "conqueror.webp",
+                "titan.webp",
+                "thunderbolt.webp",
+                "sarissa.webp",
+                "tempest-cannon"
                 ];
 
             return GetAssetFileLinks("arty/Gun/Collonial", files);
