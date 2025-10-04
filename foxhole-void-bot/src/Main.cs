@@ -66,7 +66,7 @@ host.MapFallbackToPage("/_Host");
 host.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "obj", "Debug", "net9.0", "win-x64","scopedcss","bundle")),
+        Path.Combine(Directory.GetCurrentDirectory(), "obj", host.Environment.IsDevelopment() ? "Debug" : "Release", "net9.0", "win-x64","scopedcss","bundle")),
     RequestPath = "/css"
 });
 
