@@ -1,7 +1,7 @@
 ﻿.map-selector {
     width: 12.5%;
-    height: 100vh;
-    max-height: 100vh;
+    height: 100%;
+    max-height: 100%;
     background-color: #2a2a2a;
     border-left: 2px solid white;
     z-index: 0;
@@ -14,15 +14,15 @@
     height: 100%;
 }
 .button-container {
-    height: 94.5vh;
+    height: 94.5%;
     overflow: auto;
 }
 .search-bar {
     flex: 0 0 auto; /* Prevent shrinking or growing */
     width: 100%;
-    height: 5vh;
-    padding-top: 2.5vh;
-    padding-bottom: 2.5vh;
+    height: 5%;
+    padding-top: 2.5%;
+    padding-bottom: 2.5%;
     box-sizing: border-box;
     overflow: hidden;
 }

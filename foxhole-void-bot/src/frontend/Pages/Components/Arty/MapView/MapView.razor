@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using System.Globalization
 @using Microsoft.JSInterop
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.CircleMarker
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapMarker
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.MapLine
 
@@ -21,22 +22,31 @@
              @onclick="HandleClick" />
              @if(!start.IsNull()){
                 <MapMarker coords="@start" scale="@scale" />
+                @if(gun is not null)
+                {
+                    <CircleComponent coords="@start" scale="@scale" RadiusMeters="@gun.MinRange" BorderStyle="dashed" BorderColor="red" />
+                    <CircleComponent coords="@start" scale="@scale" RadiusMeters="@gun.MaxRange" BorderStyle="solid" BorderColor="green" />
+                }
              }
             @if (!end.IsNull())
             {
                 <MapMarker coords="@end" scale="@scale" Color="red" />
                 <MapLine start="@start" end="@end" scale="@scale" />
+            @if (gun is not null)
+            {
+                <CircleComponent coords="@end" scale="@scale" RadiusMeters="@gun.InacuracyMax" BorderStyle="dotted" BorderColor="black" />
             }
+        }
 
     </div>
 </div>
 
 
 @code {
-
+    [Parameter] public ArtyGun gun { get; set; }
     [Parameter] public string uri { get; set; }
     [Parameter] public string name { get; set; }
-    [Parameter] public EventCallback<(Coordinate, UInt16, UInt16)> OnImageClick { get; set; }
+    [Parameter] public EventCallback<(Coordinate, UInt16, UInt16,bool)> OnImageClick { get; set; }
     [Parameter] public EventCallback<(UInt16, UInt16)> OnMove { get; set; }
     [Parameter] public int ImageWidth { get; set; } = 2048;
     [Parameter] public int ImageHeight { get; set; } = 1776;
@@ -106,7 +116,7 @@
             OnMove.InvokeAsync(((UInt16)offsetX, (UInt16)offsetY));
         }
     }
-     [Inject] private IJSRuntime JS { get; set; }
+    [Inject] private IJSRuntime JS { get; set; }
 
     private async Task HandleClick(MouseEventArgs e)
     {
@@ -121,14 +131,16 @@
             X = (ushort)Math.Clamp(pixelX, 0, ImageWidth),
             Y = (ushort)Math.Clamp(pixelY, 0, ImageHeight)
         };
+        bool startValueSet = false;
         if(start.IsNull() || e.CtrlKey) {
+            startValueSet = true;
             start.X = (UInt16)e.OffsetX;
             start.Y = (UInt16)e.OffsetY;
         } else {
             end.X = (UInt16)e.OffsetX;
             end.Y = (UInt16)e.OffsetY;
         }
-        await OnImageClick.InvokeAsync((coord, (UInt16)e.OffsetX, (UInt16)e.OffsetY ));
+        await OnImageClick.InvokeAsync((coord, (UInt16)e.OffsetX, (UInt16)e.OffsetY, startValueSet));
     }
 
     private record ImageSize(double Width, double Height);

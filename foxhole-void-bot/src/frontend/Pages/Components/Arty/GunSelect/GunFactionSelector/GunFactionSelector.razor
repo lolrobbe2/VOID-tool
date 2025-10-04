@@ -57,7 +57,7 @@
     {
         if (firstRender)
         {
-           CollonialUrls = await JS.InvokeAsync<string[]>("fetchCollonialUrls");
+            CollonialUrls = await JS.InvokeAsync<string[]>("fetchCollonialUrls");
 
             StateHasChanged();
 

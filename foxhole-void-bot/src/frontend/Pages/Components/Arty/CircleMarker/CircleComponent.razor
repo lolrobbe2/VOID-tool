@@ -1,0 +1,31 @@
+﻿@using FoxholeBot.types
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using System.Globalization
+<div class="circle"
+     style="@Style">
+</div>
+
+@code {
+    private double metersPerPixel = 1900.0 / 1776.0;
+
+    [Parameter] public Coordinate coords { get; set; } // X,Y position
+    [Parameter] public double scale { get; set; } // scaling factor
+    [Parameter] public double RadiusMeters { get; set; } = 100.0; // size in meters
+    [Parameter] public string BorderColor { get; set; } = "white";
+    [Parameter] public string BorderStyle { get; set; } = "solid";
+
+    private double DiameterPx => RadiusMeters * metersPerPixel / 1.45;
+
+    private string Style =>
+        $"position:absolute;" +
+        $"left:{coords.X.ToString("F2", CultureInfo.InvariantCulture)}px;" +
+        $"top:{coords.Y.ToString("F2", CultureInfo.InvariantCulture)}px;" +
+        $"width:{(DiameterPx).ToString("F2", CultureInfo.InvariantCulture)}px;" +
+        $"height:{(DiameterPx).ToString("F2", CultureInfo.InvariantCulture)}px;" +
+        $"border:{(2.0 / scale).ToString("F2", CultureInfo.InvariantCulture)}px {BorderStyle} {BorderColor};" +
+        $"border-radius:50%;" +
+        $"background-color:transparent;";
+}
+

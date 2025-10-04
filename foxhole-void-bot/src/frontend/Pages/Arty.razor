@@ -11,19 +11,29 @@
 <MapSelect OnMapSelected="@HandleMapSelection" />
 @if (!string.IsNullOrEmpty(selectedUri))
 {
-    <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" />
+    <MapView uri="@selectedUri" name="@selectedName" OnImageClick="@HandleMapClick" OnMove="@HandleMapMove" gun="@selected" />
 }
-<BottomPanel MapName="@selectedName" />
-<Compass />
+<BottomPanel MapName="@selectedName" start="@start" end="@end" strenght="@strenght" direction="@direction" gun="@selected" />
+<Compass OnChange="@OnWindDirectionSelected" />
 <WindSelector OnWindSelectedCallBack="@OnWindSelected"/>
-<GunFactionSelector />
+<GunFactionSelector OnGunSelectedCallBack="@OnGunSelected" />
 @code {
+    private ArtyGun selected { get; set; }
     private double metersPerPixel = 1900 / 1776; 
     private string selectedUri;
     private string selectedName;
-    private async Task OnWindSelected(WindStrenght strength)
+    private WindStrenght strenght { get; set; } = WindStrenght.CALM;
+    private WindDirection direction { get; set; } = WindDirection.N;
+    private Coordinate start = new Coordinate();
+    private Coordinate end = new Coordinate();
+    private async Task OnWindSelected(WindStrenght newStrength)
     {
-        
+        this.strenght = newStrength;
+    }
+
+    private async Task OnWindDirectionSelected(WindDirection windDirection)
+    {
+        this.direction = windDirection;
     }
     private void HandleMapSelection((string Uri, string Name) selection)
     {
@@ -33,16 +43,28 @@
         // You can now load the map, update UI, etc.
     }
 
-    private void HandleMapClick((Coordinate coordinate, UInt16 screenX, UInt16 screenY) coordinates)
+    private void HandleMapClick((Coordinate coordinate, UInt16 screenX, UInt16 screenY, bool startCoordinate) coordinates)
     {
-      
+
         Console.WriteLine($"Clicked on: x:{coordinates.coordinate.X} y: {coordinates.coordinate.Y}!");
+        if (coordinates.startCoordinate)
+        {
+            start = coordinates.coordinate;
+        } 
+        else
+        {
+            end = coordinates.coordinate;
+        }
+        StateHasChanged();
     }
 
     private void HandleMapMove((UInt16 X, UInt16 Y) offset)
     {
-       
-    }
 
+    }
+    private async Task OnGunSelected(ArtyGun gun)
+    {
+        selected = gun;
+    }
 }
 

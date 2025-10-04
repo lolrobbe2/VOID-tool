@@ -45,7 +45,7 @@ namespace FoxholeBot.types
         /// <returns>(double) vertical distance</returns>
         private double GetVerticalDistance()
         {
-            return Math.Sin((double)Direction) * GetDistance();
+            return Math.Cos((double)Direction) * GetDistance();
         }
 
         /// <summary>

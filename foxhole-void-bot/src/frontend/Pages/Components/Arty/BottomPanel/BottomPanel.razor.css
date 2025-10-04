@@ -8,7 +8,7 @@
     border-left: 2px solid white;
     z-index: 0;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
 }
 
@@ -21,3 +21,21 @@
     font-weight: bold;
     font-size: medium;
 }
+.wind-table {
+    border-collapse: collapse; /* ensures borders merge nicely */
+    text-align: center;
+    border: 0.1rem solid #7a5c3c; /* outer table border */
+
+}
+
+    .wind-table thead {
+        color: green;
+        border-bottom: 0.15rem solid #7a5c3c; /* outer table border */
+    }
+    .wind-table td {
+        border: 0.1rem solid #7a5c3c; /* outer table border */
+        color: #7a5c3c;
+    }
+    .wind-table thead.notviable {
+        color: red;
+    }

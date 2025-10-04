@@ -1,8 +1,79 @@
-﻿@using foxhole_void_bot.src.frontend.Pages.Components.Arty.Compass
+﻿@using FoxholeBot.types
+@using System.Globalization
+@using foxhole_void_bot.src.frontend.Pages.Components.Arty.Compass
 <div class="bottom-panel">
+    @if (initial is not null)
+    {
+        <table class="wind-table">
+            <thead class=" @(initial?.GetVectorDistance() <= gun?.MaxRange && initial?.GetVectorDistance() >= gun?.MinRange? "" : "notviable")">
+            <tr>
+                <th colspan="2">NO WIND</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Distance</td>
+                <td>@initial?.GetVectorDistance()</td>
+            </tr>
+            <tr>
+                <td>Angle</td>
+                <td>@initial?.GetAngle().ToString("F2", CultureInfo.InvariantCulture)&deg;</td>
+            </tr>
+        </tbody>
+    </table>
+    }
     <p class="map-name">@MapName</p>
+    @if (Corrected is not null)
+    {
+        <table class="wind-table">
+            <thead class=" @(Corrected?.GetVectorDistance() <= gun?.MaxRange && Corrected?.GetVectorDistance() >= gun?.MinRange ? "" : "notviable")">
+                <tr>
+                    <th colspan="2">WITH WIND</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Distance</td>
+                    <td>@Corrected?.GetVectorDistance()</td>
+                </tr>
+                <tr>
+                    <td>Angle</td>
+                    <td>@Corrected?.GetAngle().ToString("F2", CultureInfo.InvariantCulture)&deg;</td>
+                </tr>
+            </tbody>
+        </table>
+    }
 </div>
 
 @code {
     [Parameter] public string MapName { get; set; } = "hello";
+    [Parameter] public WindStrenght strenght { get; set; }
+    [Parameter] public WindDirection direction { get; set; }
+    [Parameter] public Coordinate start { get; set; }
+    [Parameter] public Coordinate end  { get; set; }
+    [Parameter] public ArtyGun gun { get; set; }
+    private CoordsVector initial { get; set; }
+    private CoordsVector Corrected { get; set; }
+
+    private CoordsVector WindCoordsVector { get; set; }
+    private WindVector windVector { get; set; }
+    private double metersPerPixel = 1900.0 / 1776.0;
+
+    protected override void OnParametersSet()
+    {
+        if (AllParametersSet())
+        {
+            Console.WriteLine("all parameters set");
+            initial = new CoordsVector() { start = start, end = end };
+            windVector = new WindVector(gun, direction, strenght);
+            WindCoordsVector = windVector.GetCoordsVector((float)metersPerPixel);
+            Corrected = initial + WindCoordsVector;
+        }
+    }   
+    private bool AllParametersSet()
+    {
+        return (
+                 !start.IsNull()
+                 && !end.IsNull());
+    }
 }

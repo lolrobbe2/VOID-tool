@@ -44,11 +44,11 @@
     }
 
 .image-button.selected {
-    background-color: #7a5c3c !important;
+    background-color: #7a5c3c;
 }
 
     .image-button.selected p {
-        color: #2a2a2a !important;
+        color: #2a2a2a;
     }
 
 .image-container {
