@@ -8,7 +8,7 @@
 @namespace FoxholeBot.Components
 
 <div id="videoBackgroundCarousel">
-    @if (VideoUrls.Count > 0)
+    @if (VideoUrls.Length > 0)
     {
         var videoUrl = VideoUrls[currentIndex];
         <video @ref="videoRef" autoplay loop playsinline preload="auto">
@@ -18,21 +18,11 @@
     }
 </div>
 
-<script>
-    window.reloadAndPlayVideo = function (videoElement, offsetSeconds) {
-    if (videoElement) {
-    videoElement.muted = true;
-    videoElement.currentTime = offsetSeconds || 0; // Jump to offset
-    videoElement.load();
-    videoElement.play().catch(err => console.warn("Autoplay failed:", err));
-    }
-    };
-</script>
 
 @code {
     #nullable enable
     [Parameter]
-    public List<string> VideoUrls { get; set; } = new();
+    public string[] VideoUrls { get; set; } = [];
 
     private int currentIndex = 0;
     private Timer? carouselTimer;
@@ -44,7 +34,7 @@
         carouselTimer = new Timer(7000);
         carouselTimer.Elapsed += async (_, __) =>
         {
-            currentIndex = (currentIndex + 1) % VideoUrls.Count;
+            currentIndex = (currentIndex + 1) % VideoUrls.Length;
             Console.WriteLine($"Switching to video index: {currentIndex}");
 
             await InvokeAsync(async () =>
@@ -67,10 +57,44 @@
         {
             hasInitialized = true;
             await Task.Delay(100); // Give Blazor time to hydrate the DOM
-            await JS.InvokeVoidAsync("reloadAndPlayVideo", videoRef);
+                                   // Inject the JS function dynamically (only once)
+            string jsCode = @"
+            window.reloadAndPlayVideo = function (videoElement, offsetSeconds) {
+                if (videoElement) {
+                    videoElement.muted = true;
+                    videoElement.currentTime = offsetSeconds || 0;
+                    videoElement.load();
+                    videoElement.play().catch(err => console.warn('Autoplay failed:', err));
+                }
+            };
+        ";
+
+            await JS.InvokeVoidAsync("eval", jsCode);
+
+            // Call the injected JS function
+            await JS.InvokeVoidAsync("reloadAndPlayVideo", videoRef, 0); // Start at 0 seconds
         }
     }
+    private async Task InjectVideoScriptAsync()
+    {
+        string jsCode = @"
+            window.reloadAndPlayVideo = function (videoElement, offsetSeconds) {
+                if (videoElement) {
+                    videoElement.muted = true;
+                    videoElement.currentTime = offsetSeconds || 0;
+                    videoElement.load();
+                    videoElement.play().catch(err => console.warn('Autoplay failed:', err));
+                }
+            };
+        ";
 
+        await JS.InvokeVoidAsync("eval", jsCode);
+    }
+
+    private async Task ReloadAndPlayVideoAsync(ElementReference videoElement, double offsetSeconds)
+    {
+        await JS.InvokeVoidAsync("reloadAndPlayVideo", videoElement, offsetSeconds);
+    }
 
     public void Dispose()
     {

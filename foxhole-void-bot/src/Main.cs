@@ -3,6 +3,7 @@ using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -10,11 +11,13 @@ using Microsoft.Extensions.Hosting;
 
 using NetCord;
 using NetCord.Hosting.Gateway;
+using NetCord.Hosting.Rest;
 using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
 using NetCord.Rest;
 using System;
 using System.IO;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +35,7 @@ builder.Services
     {
         options.AutoRegisterCommands = true;
     })
-.AddHttpClient()
+
 
     .AddRazorPages()
     .AddRazorRuntimeCompilation().WithRazorPagesRoot("/src/frontend/Pages");
@@ -41,7 +44,11 @@ builder.Services.Configure<AssetOptions>(options =>
     options.AssetMode = Config.GetAssetMode();
 });
 
-
+builder.Services.AddScoped(sp =>
+{
+    NavigationManager navigation = sp.GetRequiredService<NavigationManager>();
+    return new HttpClient { BaseAddress = new Uri(navigation.BaseUri) };
+});
 
 
 

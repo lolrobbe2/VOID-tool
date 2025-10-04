@@ -2,7 +2,11 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
+@using System.Net.Http
+@using System.Net.Http.Json
+
 @inject IJSRuntime JS
+@inject HttpClient Client
 
 <div class="map-selector">
     <div class="map-sidebar">
@@ -34,7 +38,9 @@
     {
         if (firstRender)
         {
-            var urls = await JS.InvokeAsync<string[]>("fetchMapUrls");
+            HttpResponseMessage response = await Client.GetAsync("api/Assets/Map");
+            response.EnsureSuccessStatusCode();
+            string[] urls = await response.Content.ReadFromJsonAsync<string[]>();
 
             mapEntries = urls.Select(url =>
             {
@@ -75,16 +81,3 @@
         OnMapSelected.InvokeAsync((uri, name));
     }
 }
-
-<script>
-    window.fetchMapUrls = async function () {
-        try {
-            const response = await fetch('/api/Assets/Map');
-            if (!response.ok) throw new Error('Failed to fetch map URLs');
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching map URLs:', error);
-            return [];
-        }
-    };
-</script>

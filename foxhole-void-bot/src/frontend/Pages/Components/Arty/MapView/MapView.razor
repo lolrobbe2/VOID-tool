@@ -120,6 +120,16 @@
 
     private async Task HandleClick(MouseEventArgs e)
     {
+        string jsCode = @"
+            window.getImageSize = (id) => {
+                const img = document.getElementById(id);
+                if (!img) return null;
+                const rect = img.getBoundingClientRect();
+                return { width: rect.width, height: rect.height };
+            };
+        ";
+
+        await JS.InvokeVoidAsync("eval", jsCode);
         var size = await JS.InvokeAsync<ImageSize>("getImageSize", "mapImage");
         // Map to native image pixels
         double pixelX = e.OffsetX * (ImageWidth / (size.Width / scale));
@@ -147,11 +157,3 @@
 
 }
 
-<script>
-    window.getImageSize = (id) => {
-        const img = document.getElementById(id);
-        if (!img) return null;
-        const rect = img.getBoundingClientRect();
-        return { width: rect.width, height: rect.height };
-    };
-</script>

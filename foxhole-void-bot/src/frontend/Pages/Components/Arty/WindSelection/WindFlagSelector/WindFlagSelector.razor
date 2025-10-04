@@ -1,7 +1,11 @@
 ﻿@using FoxholeBot.types
 @using Microsoft.JSInterop
+@using System.Net.Http
+@using System.Net.Http.Json
 @using foxhole_void_bot.src.frontend.Pages.Components.Arty.WindSelection.Button
 @inject IJSRuntime JS
+@inject HttpClient Client
+
 <div class="wind-flags">
     @if (windFlags is null)
     {
@@ -25,8 +29,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender) {
-            string[] gifs = await JS.InvokeAsync<string[]>("fetchFlagUrls");
+        if(firstRender) 
+        {
+            HttpResponseMessage response = await Client.GetAsync("/api/Assets/Wind/Flag");
+            response.EnsureSuccessStatusCode();
+            string[] gifs = await response.Content.ReadFromJsonAsync<string[]>();
 
             if (gifs is null)
                 return;
@@ -46,16 +53,5 @@
             await OnWindSelected.InvokeAsync(strength);
         }
     }
+
 }
-<script>
-    window.fetchFlagUrls = async function () {
-        try {
-            const response = await fetch('/api/Assets/Wind/Flag');
-            if (!response.ok) throw new Error('Failed to fetch flag URLs');
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching flag URLs:', error);
-            return [];
-        }
-    };
-</script>
