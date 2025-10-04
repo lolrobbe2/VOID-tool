@@ -62,14 +62,25 @@ host.MapRazorPages();
 host.UseRouting();
 host.MapBlazorHub();
 host.MapFallbackToPage("/_Host");
-
-host.UseStaticFiles(new StaticFileOptions
+if (host.Environment.IsDevelopment())
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "obj", host.Environment.IsDevelopment() ? "Debug" : "Release", "net9.0", "win-x64","scopedcss","bundle")),
-    RequestPath = "/css"
-});
+    host.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "obj", "Debug", "net9.0", "win-x64", "scopedcss", "bundle")),
+        RequestPath = "/css"
+    });
+} else
+{
+    host.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+          Path.Combine(host.Environment.ContentRootPath, "wwwroot")),
+        RequestPath = "/css"
+    });
+}
 
-// Add commands from modules
-host.AddApplicationCommandModule(typeof(StockpileCommands));
+    // Add commands from modules
+    host.AddApplicationCommandModule(typeof(StockpileCommands));
+host.AddEntryPointCommand("entrypoint", "Entry Point Command");
 await host.RunAsync();
