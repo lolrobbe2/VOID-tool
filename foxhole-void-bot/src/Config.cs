@@ -112,7 +112,7 @@ namespace FoxholeBot
 
         public static string GetAssetUri()
         {
-            return (GetEnvVariable("ASSET_MODE") == "LOCAL") ? "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main" : "/github";
+            return (GetEnvVariable("ASSET_MODE") == "LOCAL") ? "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main" : "github";
         }
     }   
 }
