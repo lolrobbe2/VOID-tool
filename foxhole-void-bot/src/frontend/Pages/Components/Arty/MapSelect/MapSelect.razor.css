@@ -16,6 +16,7 @@
 .button-container {
     height: 94.5%;
     overflow: auto;
+    scrollbar-width: none;
 }
 .search-bar {
     flex: 0 0 auto; /* Prevent shrinking or growing */
