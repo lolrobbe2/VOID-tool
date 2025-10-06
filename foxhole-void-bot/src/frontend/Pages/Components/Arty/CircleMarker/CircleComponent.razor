@@ -12,11 +12,12 @@
 
     [Parameter] public Coordinate coords { get; set; } // X,Y position
     [Parameter] public double scale { get; set; } // scaling factor
-    [Parameter] public double RadiusMeters { get; set; } = 100.0; // size in meters
+    [Parameter] public double RadiusMeters { get; set; } // size in meters
+    [Parameter] public double CurrentImageHeight { get; set; } //scale of rendered image to absolute image size
     [Parameter] public string BorderColor { get; set; } = "white";
     [Parameter] public string BorderStyle { get; set; } = "solid";
 
-    private double DiameterPx => RadiusMeters * metersPerPixel / 1.45;
+    private double DiameterPx => RadiusMeters  * 2 / 1900 * CurrentImageHeight;
 
     private string Style =>
         $"position:absolute;" +

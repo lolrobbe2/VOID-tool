@@ -24,8 +24,8 @@
                 <MapMarker coords="@start" scale="@scale" />
                 @if(gun is not null)
                 {
-                    <CircleComponent coords="@start" scale="@scale" RadiusMeters="@gun.MinRange" BorderStyle="dashed" BorderColor="red" />
-                    <CircleComponent coords="@start" scale="@scale" RadiusMeters="@gun.MaxRange" BorderStyle="solid" BorderColor="green" />
+                    <CircleComponent coords="@start" scale="@scale" RadiusMeters="@gun.MinRange" BorderStyle="dashed" BorderColor="red" CurrentImageHeight="@CurrentImageHeight"/>
+                    <CircleComponent coords="@start" scale="@scale" RadiusMeters="@gun.MaxRange" BorderStyle="solid" BorderColor="green" CurrentImageHeight="@CurrentImageHeight" />
                 }
              }
             @if (!end.IsNull())
@@ -34,7 +34,7 @@
                 <MapLine start="@start" end="@end" scale="@scale" />
             @if (gun is not null)
             {
-                <CircleComponent coords="@end" scale="@scale" RadiusMeters="@gun.InacuracyMax" BorderStyle="dotted" BorderColor="black" />
+                <CircleComponent coords="@end" scale="@scale" RadiusMeters="@gun.InacuracyMax" BorderStyle="dotted" BorderColor="black" CurrentImageHeight="@CurrentImageHeight" />
             }
         }
 
@@ -50,9 +50,13 @@
     [Parameter] public EventCallback<(UInt16, UInt16)> OnMove { get; set; }
     [Parameter] public int ImageWidth { get; set; } = 2048;
     [Parameter] public int ImageHeight { get; set; } = 1776;
+    [Parameter] public int MapWidth { get; set; } = 2197;
+    [Parameter] public int MapHeight { get; set; } = 1900;
+
 
     private string lastUri;
     private double scale = 1.0;
+    private double CurrentImageHeight = 1.0;
     private double offsetX = 0;
     private double offsetY = 0;
     private bool isPanning = false;
@@ -78,6 +82,7 @@
             lastUri = uri;
         }
     }
+
 
 
     private void OnWheel(WheelEventArgs e)
@@ -132,14 +137,14 @@
         await JS.InvokeVoidAsync("eval", jsCode);
         var size = await JS.InvokeAsync<ImageSize>("getImageSize", "mapImage");
         // Map to native image pixels
-        double pixelX = e.OffsetX * (ImageWidth / (size.Width / scale));
-        double pixelY = e.OffsetY * (ImageHeight / (size.Height / scale));
-
+        double pixelX = (e.OffsetX / (size.Width / scale)) * MapWidth;
+        double pixelY = (e.OffsetY / (size.Height / scale)) * MapHeight;
+        CurrentImageHeight = size.Height / scale;
 
         var coord = new Coordinate()
         {
-            X = (ushort)Math.Clamp(pixelX, 0, ImageWidth),
-            Y = (ushort)Math.Clamp(pixelY, 0, ImageHeight)
+            X = (ushort)Math.Clamp(pixelX, 0, MapWidth),
+            Y = (ushort)Math.Clamp(pixelY, 0, MapHeight)
         };
         bool startValueSet = false;
         if(start.IsNull() || e.CtrlKey) {
