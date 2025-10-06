@@ -77,13 +77,18 @@ namespace FoxholeBot.types
         /// <returns></returns>
         public float GetAngle()
         {
+            bool HorizontalNegative = GetHorizontalDistance() < 0;
+            bool VerticalNegative = GetVerticalDistance() < 0;
             double angleRad = Math.Atan2((double)GetHorizontalDistance(), (double)GetVectorDistance());
-            double angleDeg = angleRad * (180.0 / Math.PI);
+            double angleDeg = angleRad * (360.0 / Math.PI);
             //we do 360 minus as foxhole 0° is at the top.
-            float foxholeAngle = (float)angleDeg * 2;
-            if (foxholeAngle < 0)
-                foxholeAngle += 360;
-
+            float foxholeAngle = (float)angleDeg;
+            if (!HorizontalNegative && !VerticalNegative) 
+                foxholeAngle = 180 - foxholeAngle;
+            else if (HorizontalNegative == true && VerticalNegative == false)
+                foxholeAngle = 180 + Math.Abs(foxholeAngle);
+            else if (HorizontalNegative == true && VerticalNegative == true)
+                foxholeAngle = 360 - Math.Abs(foxholeAngle);
             return foxholeAngle;
         }
     }
