@@ -46,12 +46,13 @@
 </div>
 
 @code {
+    #nullable enable
     [Parameter] public string MapName { get; set; } = "hello";
     [Parameter] public WindStrenght strenght { get; set; }
     [Parameter] public WindDirection direction { get; set; }
     [Parameter] public Coordinate start { get; set; }
     [Parameter] public Coordinate end  { get; set; }
-    [Parameter] public ArtyGun gun { get; set; }
+    [Parameter] public ArtyGun? gun { get; set; }
     private CoordsVector initial { get; set; }
     private CoordsVector Corrected { get; set; }
 
@@ -61,7 +62,7 @@
 
     protected override void OnParametersSet()
     {
-        if (AllParametersSet())
+        if (AllParametersSet() && gun is not null)
         {
             Console.WriteLine("all parameters set");
             initial = new CoordsVector() { start = start, end = end };
