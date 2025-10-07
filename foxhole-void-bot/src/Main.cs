@@ -1,6 +1,7 @@
 ﻿
 using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
+using FoxholeBot.commands;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -18,14 +19,15 @@ using NetCord.Rest;
 using System;
 using System.IO;
 using System.Net.Http;
+Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services
     .AddMemoryCache()
     .AddScoped<StockpilesRepository>()
     .AddScoped<StockPileItemsRepository>()
     .AddScoped<FoxholeRepository>()
+    .AddScoped<DiscordRepository>()
     .AddFirebase()
     .AddDiscordGateway((options, _) =>
     {
@@ -89,5 +91,7 @@ if (host.Environment.IsDevelopment())
 
     // Add commands from modules
     host.AddApplicationCommandModule(typeof(StockpileCommands));
+    host.AddApplicationCommandModule(typeof(ManagementCommands));
+
 host.AddEntryPointCommand("entrypoint", "Entry Point Command");
 await host.RunAsync();
