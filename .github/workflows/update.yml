@@ -1,0 +1,15 @@
+# .github/workflows/notify-update.yml
+name: Notify Update
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  call-uri:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call update endpoint
+        run: |
+          curl -X GET https://void-tool.onrender.com/Health/update

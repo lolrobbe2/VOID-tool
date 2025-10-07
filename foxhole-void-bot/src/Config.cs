@@ -114,5 +114,13 @@ namespace FoxholeBot
         {
             return (GetEnvVariable("ASSET_MODE") == "LOCAL") ? "https://github.com/lolrobbe2/VOID-tool/raw/refs/heads/main" : "github";
         }
-    }   
+        public static string GetDeployUri()
+        {
+            return GetEnvVariable("DEPLOY_HOOK"); 
+        }
+        public static string GetPassWord()
+        {
+            return GetEnvVariable("PASSWORD");
+        }
+    }
 }
