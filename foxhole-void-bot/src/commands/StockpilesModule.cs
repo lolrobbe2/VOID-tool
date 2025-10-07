@@ -73,7 +73,7 @@ public class RegionAutocompleteProvider : IAutocompleteProvider<AutocompleteInte
     public async ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, AutocompleteInteractionContext context)
     {
         var userInput = option.Value?.ToString() ?? string.Empty;
-
+        
         string[] regions = await _repository.GetStockpileRegions();
         regions = regions.Append("none").ToArray();
         return regions.Where(r => r.Contains(userInput, StringComparison.OrdinalIgnoreCase)).OrderBy(r => r).Take(5).Select(r => new ApplicationCommandOptionChoiceProperties(r, r));
