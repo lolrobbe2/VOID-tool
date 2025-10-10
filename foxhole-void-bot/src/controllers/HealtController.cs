@@ -22,7 +22,7 @@ namespace FoxholeBot.Controllers
         [HttpPost("restart")]
         public async Task<IActionResult> PostAsync() {
             Guild guild = await _discordRepo.GetGuild("The VOID");
-            GuildChannel channel = await _discordRepo.GetChannel(guild, 1300565932065685524);
+            GuildChannel channel = await _discordRepo.GetChannel(guild, "void-tool-channel");
             await _discordRepo.SendMessage(channel, "VOID-tool attempting restart...");
             using (HttpClient client = new HttpClient())
             {
