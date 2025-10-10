@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Call update endpoint
         run: |
-          curl -X GET https://void-tool.onrender.com/Health/update
+          curl -X GET https://void-tool.onrender.com/Health/restart
