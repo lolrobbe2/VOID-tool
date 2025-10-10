@@ -12,7 +12,8 @@ namespace FoxholeBot.types
     {
         SMALL_SHELL = 120,
         MEDIUM_SHELL = 150,
-        LARGE_SHELL = 300
+        LARGE_SHELL = 300,
+        ROCKET = 30
     }
     public class ArtyGun
     {
@@ -112,6 +113,18 @@ namespace FoxholeBot.types
                 ImageName="sarissa.webp",
                 FireRate=20f,
                 Type=Type.MEDIUM_SHELL
+            },            
+            new (){
+                Name="R-17 “Retiarius” Skirmisher",
+                Bias=10,
+                MinRange = 375,
+                MaxRange = 500,
+                InacuracyMin = 37.5f,
+                InacuracyMax = 51f,
+                Faction = Faction.COLONIAL,
+                ImageName="retiarius.webp",
+                FireRate=15f,
+                Type=Type.ROCKET
             },
             new (){
                 Name="Titan 150",
