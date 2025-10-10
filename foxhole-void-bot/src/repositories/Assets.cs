@@ -83,7 +83,8 @@ namespace FoxholeBot.repositories
                 "thunderbolt.webp",
                 "sarissa.webp",
                 "tempest-cannon.webp",
-                "storm-cannon.webp"
+                "storm-cannon.webp",
+                "retiarius.webp"
                 ];
 
             return GetAssetFileLinks("arty/Gun/Collonial", files);
