@@ -16,7 +16,8 @@ namespace FoxholeBot.repositories
         {
             string[] files = [
                  "demo1.webm",
-                "demo2.webm"
+                "demo2.webm",
+                "demo3.webm"
                  ];
             return GetAssetFileLinks("videos", files);
         }
