@@ -41,16 +41,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\AssetOptions.cs" />
-    <Compile Include="src\commands\ManagementModule.cs" />
     <Compile Include="src\Config.cs" />
-    <Compile Include="src\controllers\AssetsController.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
     <Compile Include="src\Main.cs" />
+    <Compile Include="src\commands\ManagementModule.cs" />
     <Compile Include="src\commands\StockpilesModule.cs" />
+    <Compile Include="src\controllers\AssetsController.cs" />
     <Compile Include="src\controllers\FoxholeController.cs" />
     <Compile Include="src\controllers\HealtController.cs" />
     <Compile Include="src\controllers\StockpileController.cs" />
+    <Compile Include="src\modal\StockPileModal.cs" />
     <Compile Include="src\repositories\Assets.cs" />
     <Compile Include="src\repositories\Cache.cs" />
     <Compile Include="src\repositories\Discord.cs" />
@@ -59,8 +60,10 @@
     <Compile Include="src\repositories\Stockpiles.cs" />
     <Compile Include="src\types\ArtyGun.cs" />
     <Compile Include="src\types\CoordsVector.cs" />
+    <Compile Include="src\types\ExtensionMethods.cs" />
     <Compile Include="src\types\InvetoryReport.cs" />
     <Compile Include="src\types\Item.cs" />
+    <Compile Include="src\types\OutputFormatter.cs" />
     <Compile Include="src\types\Wind.cs" />
     <Compile Include="src\types\WindVector.cs" />
   </ItemGroup>
@@ -73,5 +76,6 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version=" 9.0.8" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
   </ItemGroup>
 </Project>

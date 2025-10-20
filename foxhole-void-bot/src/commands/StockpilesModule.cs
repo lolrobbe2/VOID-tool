@@ -1,23 +1,38 @@
+using FoxholeBot.modal;
 using FoxholeBot.repositories;
+using FoxholeBot.types;
+using Microsoft.VisualBasic;
 using NetCord;
 using NetCord.Rest;
+using NetCord.Services;
 using NetCord.Services.ApplicationCommands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 #nullable enable
 
 [SlashCommand("stockpiles", "Stockpiles command")]
 public class StockpileCommands : ApplicationCommandModule<ApplicationCommandContext>
 {
+    private readonly StockPileItemsRepository _itemsRepository;
     private readonly StockpilesRepository _repository;
+    private readonly FoxholeRepository _foxhole;
 
-    public StockpileCommands(StockpilesRepository repository)
+
+    public StockpileCommands(StockPileItemsRepository itemsRepository, StockpilesRepository repository, FoxholeRepository foxhole)
     {
+        _itemsRepository = itemsRepository;
         _repository = repository;
+        _foxhole = foxhole;
     }
 
     [SubSlashCommand("list", "Get stockpiles")]
@@ -59,6 +74,101 @@ public class StockpileCommands : ApplicationCommandModule<ApplicationCommandCont
 
         return message.ToString();
     }
+
+    [SubSlashCommand("create", "Update Stockpiles")]
+    public async Task CreateStockpile([Description("Select the region of the stockpile"), SlashCommandParameter(AutocompleteProviderType = typeof(AvailableRegionAutocompleteProvider))] string region, [Description("Subregion of the stockpile")] string subregion, [Description("the name of the stockpile")] string name, [Description("6 digit code of the stockpile")] string code)
+    {
+        await _repository.CreateStockPile(name, region, subregion, code);
+    }
+
+    [SubSlashCommand("update", "Update Stockpiles")]
+    public async Task UpdateStockpile([Description("TSV file containing stockpile data")] Attachment attachment)
+    {
+        if (!attachment.FileName.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase))
+
+            return;
+
+        await this.Context.Interaction.SendResponseAsync(InteractionCallback.DeferredMessage());
+        using var httpClient = new HttpClient();
+        string content = await httpClient.GetStringAsync(attachment.Url);
+
+        InvetoryReport report = new InvetoryReport(content);
+
+        // TODO: Parse and process the TSV content
+
+        foreach (var (stockpileName, items) in report.SplitByStockpile())
+        {
+            StockPile? stockpile = await _repository.GetStockPileAsync(stockpileName);
+            if (stockpile is null)
+            {
+                await Context.Interaction.SendFollowupMessageAsync($"Stockpile with name: {stockpileName}");
+            }
+            else
+            {
+
+                var stockpileItems = items.Select(item => new StockPileItem() { Name = item.Name, Count = item.Amount, Crated = item.Crated.Equals("true") });
+                await _itemsRepository.SetStockPileItemsAsync(stockpile, stockpileItems.ToArray());
+                await Context.Interaction.SendFollowupMessageAsync(
+                new InteractionMessageProperties
+                {
+                    Embeds = [
+                        new EmbedProperties
+                        {
+                            Author = new EmbedAuthorProperties
+                            {
+                                 Name = Context.User.Username,   // the user's name
+                                    IconUrl = Context.User.DefaultAvatarUrl?.ToString() // optional: show avatar
+                            },
+                            Title= $"Updated Stockpile",
+                            Fields =
+                            [
+                                new EmbedFieldProperties(){
+                                    Name = "Name",
+                                    Value = stockpile.Name,
+                                    Inline = true
+                                },
+                                new EmbedFieldProperties(){
+                                    Name = "Region",
+                                    Value = stockpile.Region,
+                                    Inline = true
+                                },
+                                new EmbedFieldProperties(){
+                                    Name = "SubRegion",
+                                    Value = stockpile.Subregion,
+                                    Inline = true
+                                },
+                            ],
+                            Timestamp = DateTime.Now,
+
+
+
+                        }
+                    ]
+                });
+            }
+        }
+        return;
+    }
+
+    [SubSlashCommand("report", "create XLSX file of selected stockpile")]
+    public async Task ReportStockpile([Description("Stockpile name")] string name)
+    {
+       StockPile? stockpile = await _repository.GetStockPileAsync(name);
+        if (stockpile is null)
+        {
+            await Context.Channel.SendMessageAsync("Stockpile does not exist!");
+            return;
+        }
+
+        OutputFormatter outputFormatter = new OutputFormatter();
+        outputFormatter.AddStockpile(stockpile, await _itemsRepository.GetStockPileItemsAsync(stockpile));
+
+        await Context.Interaction.SendResponseAsync(InteractionCallback.Message(new InteractionMessageProperties()
+        {
+            Attachments = [new AttachmentProperties($"{stockpile.Region}_{stockpile.Name}.xlsx",outputFormatter.Build())]
+        }));
+
+    }
 }
 
 public class RegionAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
@@ -79,4 +189,26 @@ public class RegionAutocompleteProvider : IAutocompleteProvider<AutocompleteInte
         return regions.Where(r => r.Contains(userInput, StringComparison.OrdinalIgnoreCase)).OrderBy(r => r).Take(5).Select(r => new ApplicationCommandOptionChoiceProperties(r, r));
     }
 }
+
+
+public class AvailableRegionAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
+{
+    private readonly FoxholeRepository _repository;
+
+    public AvailableRegionAutocompleteProvider(FoxholeRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, AutocompleteInteractionContext context)
+    {
+        var userInput = option.Value?.ToString() ?? string.Empty;
+
+        string[] regions = _repository.GetAllRegions();
+        regions = regions.Append("none").ToArray();
+        return regions.Where(r => r.Contains(userInput, StringComparison.OrdinalIgnoreCase)).OrderBy(r => r).Take(5).Select(r => new ApplicationCommandOptionChoiceProperties(r, r));
+    }
+}
+
+
 
