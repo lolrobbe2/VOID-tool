@@ -26,19 +26,25 @@ public class StockpileCommands : ApplicationCommandModule<ApplicationCommandCont
     private readonly StockPileItemsRepository _itemsRepository;
     private readonly StockpilesRepository _repository;
     private readonly FoxholeRepository _foxhole;
+    private readonly DiscordRepository _discord;
 
 
-    public StockpileCommands(StockPileItemsRepository itemsRepository, StockpilesRepository repository, FoxholeRepository foxhole)
+    public StockpileCommands(StockPileItemsRepository itemsRepository, StockpilesRepository repository, FoxholeRepository foxhole, DiscordRepository discordRepository)
     {
         _itemsRepository = itemsRepository;
         _repository = repository;
         _foxhole = foxhole;
+        _discord = discordRepository;
     }
 
     [SubSlashCommand("list", "Get stockpiles")]
     public async Task<string> ListStockpiles([SlashCommandParameter(Name = "region", Description = "the region/hex name", AutocompleteProviderType = typeof(RegionAutocompleteProvider))] string? region)
     {
-        if (string.IsNullOrEmpty(region) || region.Equals("none"))
+        if (Context.User is GuildUser member && !await _discord.UserHasRole(member, "FH-VOID-Regiment"))
+        {
+            return "unautherized";
+        }
+            if (string.IsNullOrEmpty(region) || region.Equals("none"))
             return await GetStockpilesRegion(region!);
         return await GetStockpiles();
     }
@@ -78,12 +84,20 @@ public class StockpileCommands : ApplicationCommandModule<ApplicationCommandCont
     [SubSlashCommand("create", "Update Stockpiles")]
     public async Task CreateStockpile([Description("Select the region of the stockpile"), SlashCommandParameter(AutocompleteProviderType = typeof(AvailableRegionAutocompleteProvider))] string region, [Description("Subregion of the stockpile")] string subregion, [Description("the name of the stockpile")] string name, [Description("6 digit code of the stockpile")] string code)
     {
-        await _repository.CreateStockPile(name, region, subregion, code);
+        if (Context.User is GuildUser member && await _discord.UserHasRole(member, "FH-VOID-Regiment"))
+        {
+            await _repository.CreateStockPile(name, region, subregion, code);
+        }
     }
 
     [SubSlashCommand("update", "Update Stockpiles")]
     public async Task UpdateStockpile([Description("TSV file containing stockpile data")] Attachment attachment)
     {
+        if (Context.User is GuildUser member && !await _discord.UserHasRole(member, "FH-VOID-Regiment"))
+        {
+            return;
+        }
+
         if (!attachment.FileName.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase))
 
             return;
@@ -153,7 +167,13 @@ public class StockpileCommands : ApplicationCommandModule<ApplicationCommandCont
     [SubSlashCommand("report", "create XLSX file of selected stockpile")]
     public async Task ReportStockpile([Description("Stockpile name")] string name)
     {
-       StockPile? stockpile = await _repository.GetStockPileAsync(name);
+        if (Context.User is GuildUser member && !await _discord.UserHasRole(member, "FH-VOID-Regiment"))
+        {
+            await Context.Channel.SendMessageAsync("unautherized");
+            return;
+        }
+
+        StockPile? stockpile = await _repository.GetStockPileAsync(name);
         if (stockpile is null)
         {
             await Context.Channel.SendMessageAsync("Stockpile does not exist!");

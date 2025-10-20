@@ -1,5 +1,6 @@
 ﻿using BeleidsPlanApi.src.database.Repo;
 using Microsoft.Extensions.Caching.Memory;
+using NetCord;
 using NetCord.Rest;
 using System;
 using System.Collections.Generic;
@@ -95,6 +96,17 @@ namespace FoxholeBot.repositories
             MessageProperties properties = new MessageProperties();
             properties.Content = message;
             await _client.Rest.SendMessageAsync(channel.Id, properties);
+        }
+
+        public async Task<IEnumerable<Role>> GetUserRoles(GuildUser member)
+        {
+           var roles = await _client.Rest.GetGuildRolesAsync(member.GuildId);
+           return roles.Where(r => member.RoleIds.Contains(r.Id));
+        }
+
+        public async Task<bool> UserHasRole(GuildUser member, string name)
+        {
+            return (await GetUserRoles(member)).FirstOrDefault(Role => Role.Name == name)  is not null;
         }
     }
 }
