@@ -13,16 +13,22 @@ namespace FoxholeBot.repositories
     public class StockPile
     {
         [FirestoreProperty]
-        public string Name { get; set; }
+        public required string Name { get; set; } = "";
 
         [FirestoreProperty]
-        public string Region { get; set; }
+        public required string Region { get; set; } = "";
 
         [FirestoreProperty]
-        public string Subregion { get; set; }
+        public required string Subregion { get; set; } = "";
 
         [FirestoreProperty]
-        public string Code { get; set; }
+        public string? Code { get; set; }
+
+        public StockPile() {
+            Name = "";
+            Region = "";
+            Subregion = "";
+        }
     }
 
     public class StockpilesRepository
@@ -47,12 +53,7 @@ namespace FoxholeBot.repositories
         public async Task CreateStockPile(string name, string region, string subregion,string code)
         {
             DocumentReference docRef = _stockpilesCollection.Document($"{region}_{subregion}_{name}");
-            StockPile item = new StockPile();
-            item.Name = name;
-            item.Region = region;
-            item.Subregion = subregion;
-            item.Code = code;
-
+            StockPile item = new StockPile() { Name = name, Region = region, Subregion = subregion, Code = code }; 
             await docRef.CreateAsync(item);
         }
 
@@ -79,6 +80,28 @@ namespace FoxholeBot.repositories
         public async Task<string[]> GetStockpileRegions()
         {
             return (await GetAllStockpilesAsync()).Select(stockpile => stockpile.Region).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        }
+
+        public async Task<StockPile?> GetStockPileAsync(string name)
+        {
+            return (await GetAllStockpilesAsync()).FirstOrDefault(stockpile => stockpile.Name.Equals(name, StringComparison.Ordinal));
+        }
+
+        public async Task ClearStockpiles()
+        {
+            string[] regions = await GetStockpileRegions();
+            foreach (var region in regions)
+            {
+                _cache.CacheInvalidate(region);
+            }
+
+            QuerySnapshot snapshot = await _stockpilesCollection.GetSnapshotAsync();
+
+            // Delete each document
+            foreach (DocumentSnapshot doc in snapshot.Documents)
+            {
+                await doc.Reference.DeleteAsync();
+            }
         }
     }
 }

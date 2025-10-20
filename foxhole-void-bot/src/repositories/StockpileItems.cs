@@ -13,11 +13,23 @@ namespace FoxholeBot.repositories
     public class StockPileItem
     {
         [FirestoreProperty]
-        public byte Count { get; set; }
+        public required UInt16 Count { get; set; }
 
         [FirestoreProperty]
-        public string Name { get; set; }
+        public required string Name { get; set; }
+
+        [FirestoreProperty]
+        public required bool Crated { get; set; }
+
     }
+
+    [FirestoreData]
+    public class StockPileDocument
+    {
+        [FirestoreProperty]
+        public StockPileItem[] Items { get; set; } = Array.Empty<StockPileItem>();
+    }
+
     public class StockPileItemsRepository
     {
         Cache<StockPileItem[]> _cache;
@@ -40,14 +52,26 @@ namespace FoxholeBot.repositories
             DocumentSnapshot stockpileDocument = await _stockpileItemsCollection.Document(stockpileName).GetSnapshotAsync();
             return _cache.CacheSet(stockpileDocument.GetValue<StockPileItem[]>("Items"), stockpileName);
         }
+        public async Task<StockPileItem[]> GetStockPileItemsAsync(StockPile stockpile)
+        {
+            return await GetStockPileItemsAsync(stockpile.Region,stockpile.Subregion,stockpile.Name);
+        }
 
         public async Task<StockPileItem[]> SetStockPileItemsAsync(string region, string subregion, string name, StockPileItem[] items)
         {
             string stockpileName = $"{region}_{subregion}_{name}";
             DocumentReference stockpileDocument = _stockpileItemsCollection.Document(stockpileName);
-            await stockpileDocument.SetAsync(items);
+            await stockpileDocument.SetAsync(new StockPileDocument
+            {
+                Items = items
+            });
             return _cache.CacheSet(items,stockpileName);
         }
+        public async Task<StockPileItem[]> SetStockPileItemsAsync(StockPile stockpile, StockPileItem[] items)
+        {
+            return await SetStockPileItemsAsync(stockpile.Region, stockpile.Subregion, stockpile.Name, items);
+        }
+
         public async Task<StockPileItem[]> AddStockpileItems(string region, string subregion, string name, StockPileItem[] items)
         {
             StockPileItem[] stockPileItems = await GetStockPileItemsAsync(region,subregion,name);
@@ -63,6 +87,12 @@ namespace FoxholeBot.repositories
 
             return await SetStockPileItemsAsync(region,subregion,name,mergedStockPileItems.ToArray());
         }
+
+        public  async Task<StockPileItem[]> AddStockpileItems(StockPile stockpile ,StockPileItem[] items)
+        {
+            return await AddStockpileItems(stockpile.Region,stockpile.Subregion,stockpile.Name,items);
+        }
+
         public async Task<StockPileItem[]> RemoveStockpileItems(string region, string subregion, string name, StockPileItem[] items)
         {
             StockPileItem[] stockPileItems = await GetStockPileItemsAsync(region, subregion, name);
@@ -81,6 +111,22 @@ namespace FoxholeBot.repositories
             }
 
             return await SetStockPileItemsAsync(region,subregion,name,mergedStockPileItems.ToArray());
+        }
+        public async Task<StockPileItem[]> RemoveStockpileItems(StockPile stockpile, StockPileItem[] items)
+        {
+            return await RemoveStockpileItems(stockpile.Region, stockpile.Subregion, stockpile.Name, items);
+        }
+        public async Task ClearStockpileItems(StockPile stockPile)
+        {
+            await ClearStockpileItems(stockPile.Region, stockPile.Subregion, stockPile.Name);
+        }
+
+        public async Task ClearStockpileItems(string region, string subregion, string name)
+        {
+            string stockpileName = $"{region}_{subregion}_{name}";
+            _cache.CacheInvalidate(stockpileName);
+            DocumentReference stockpileDocument = _stockpileItemsCollection.Document(stockpileName);
+           await stockpileDocument.DeleteAsync();
         }
     }
 }

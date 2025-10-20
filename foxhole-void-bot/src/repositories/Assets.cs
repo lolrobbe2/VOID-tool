@@ -15,7 +15,7 @@ namespace FoxholeBot.repositories
         public static string[] GetCarouselVideos()
         {
             string[] files = [
-                 "demo1.webm",
+                "demo1.webm",
                 "demo2.webm",
                 "demo3.webm"
                  ];
