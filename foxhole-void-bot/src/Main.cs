@@ -2,6 +2,7 @@
 using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
 using FoxholeBot.commands;
+using FoxholeBot.modal;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +16,9 @@ using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Rest;
 using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.ComponentInteractions;
 using NetCord.Rest;
+using NetCord.Services.ComponentInteractions;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -33,6 +36,7 @@ builder.Services
     {
         options.Token = Config.GetBotToken();
     })
+    .AddComponentInteractions<StringMenuInteraction, StringMenuInteractionContext>()
     .AddApplicationCommands((options) =>
     {
         options.AutoRegisterCommands = true;
@@ -92,6 +96,6 @@ if (host.Environment.IsDevelopment())
     // Add commands from modules
     host.AddApplicationCommandModule(typeof(StockpileCommands));
     host.AddApplicationCommandModule(typeof(ManagementCommands));
-
+    host.AddComponentInteractionModule(typeof(StockpileModule));
 host.AddEntryPointCommand("entrypoint", "Entry Point Command");
 await host.RunAsync();
