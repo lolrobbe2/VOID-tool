@@ -2,15 +2,18 @@
 using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
 using FoxholeBot.commands;
+using FoxholeBot.Discord;
 using FoxholeBot.modal;
 using FoxholeBot.repositories;
+using FoxholeBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.OpenApi.Models;
 using NetCord;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Rest;
@@ -20,6 +23,7 @@ using NetCord.Hosting.Services.ComponentInteractions;
 using NetCord.Rest;
 using NetCord.Services.ComponentInteractions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -32,6 +36,8 @@ builder.Services
     .AddScoped<FoxholeRepository>()
     .AddScoped<DiscordRepository>()
     .AddFirebase()
+    .AddDiscordAuthentication(Config.GetBotClientId(), Config.GetBotClientSecret())
+
     .AddDiscordGateway((options, _) =>
     {
         options.Token = Config.GetBotToken();
@@ -63,12 +69,20 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.OperationFilter<DiscordAuthorizeFilter>();
+});
 var host = builder.Build();
 
 if (host.Environment.IsDevelopment())
 {
     host.MapOpenApi();
-    host.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "VOID api"));
+    host.UseSwaggerUI(options => {
+        options.SwaggerEndpoint("/openapi/v1.json", "VOID api");
+        
+        }
+    );
 }
 host.MapControllers();
 host.MapRazorPages();
