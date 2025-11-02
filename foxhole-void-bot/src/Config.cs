@@ -116,11 +116,19 @@ namespace FoxholeBot
         }
         public static string GetDeployUri()
         {
-            return GetEnvVariable("DEPLOY_HOOK"); 
+            return GetEnvVariable("DEPLOY_HOOK");
         }
         public static string GetPassWord()
         {
             return GetEnvVariable("PASSWORD");
+        }
+        public static string GetBotClientId()
+        {
+            return GetEnvVariable("BOT_CLIENT_ID");
+        }
+        public static string GetBotClientSecret()
+        {
+            return GetEnvVariable("BOT_CLIENT_ID");
         }
     }
 }

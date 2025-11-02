@@ -42,6 +42,9 @@
   <ItemGroup>
     <Compile Include="src\AssetOptions.cs" />
     <Compile Include="src\Config.cs" />
+    <Compile Include="src\Discord\AuthenticationFilter.cs" />
+    <Compile Include="src\Discord\DiscordAuthSerrvice.cs" />
+    <Compile Include="src\Discord\DiscordUser.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
     <Compile Include="src\Main.cs" />
