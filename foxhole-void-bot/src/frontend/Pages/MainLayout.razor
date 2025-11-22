@@ -1,7 +1,12 @@
 ﻿@using FoxholeBot;
+@using FoxholeBot.src.Discord
+@using Microsoft.JSInterop
 @using foxhole_void_bot.src.frontend.Pages.Components.SideBar
 @inherits LayoutComponentBase
+@inject DiscordUser user
 @inject Microsoft.Extensions.Options.IOptions<AssetOptions> AssetConfig
+@inject IJSRuntime JS
+
 <div class="body">
 
     <SideBar />
@@ -10,10 +15,44 @@
 
 @code {
     private string Title => "Foxhole VOID Bot";
+    private static bool auth = false;
 
-    protected override void OnInitialized()
+    private async Task PrintSdkMethods()
+    {
+        // Inline JS executed via IJSRuntime
+        var result = await JS.InvokeAsync<Dictionary<string, string[]>>(
+            "eval",
+            @"
+console.log(window.parent.opener ?? window.parent)
+            (function() {
+                if (!window.parent.discordSdk) return { sdk: [], activity: [] };
+                return {
+                    sdk: Object.keys(window.discordSdk),
+                    activity: window.discordSdk.activity ? Object.keys(window.discordSdk.activity) : []
+                };
+            })()
+            "
+        );
+
+        Console.WriteLine("Discord SDK Methods:");
+        foreach (var method in result["sdk"])
+        {
+            Console.WriteLine(method);
+        }
+
+        Console.WriteLine("Activity Methods:");
+        foreach (var method in result["activity"])
+        {
+            Console.WriteLine(method);
+        }
+    }
+    protected async override void OnInitialized()
     {
         var assetMode = AssetConfig.Value.AssetMode;
+        await PrintSdkMethods();
         Console.WriteLine($"Mode: {assetMode}");
+        var code = await user.GetBrowserAuthorizationCodeAsync();
+        Console.WriteLine($"Code: {code}");
+        auth = true;
     }
 }

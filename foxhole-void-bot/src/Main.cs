@@ -36,8 +36,6 @@ builder.Services
     .AddScoped<FoxholeRepository>()
     .AddScoped<DiscordRepository>()
     .AddFirebase()
-    .AddDiscordAuthentication(Config.GetBotClientId(), Config.GetBotClientSecret())
-
     .AddDiscordGateway((options, _) =>
     {
         options.Token = Config.GetBotToken();
@@ -55,12 +53,12 @@ builder.Services.Configure<AssetOptions>(options =>
 {
     options.AssetMode = Config.GetAssetMode();
 });
-
 builder.Services.AddScoped(sp =>
 {
     NavigationManager navigation = sp.GetRequiredService<NavigationManager>();
     return new HttpClient { BaseAddress = new Uri(navigation.BaseUri) };
-});
+}).AddDiscordAuthentication(Config.GetBotClientId(), Config.GetBotClientSecret())
+;
 
 
 
@@ -107,9 +105,9 @@ if (host.Environment.IsDevelopment())
     });
 }
 
-    // Add commands from modules
-    host.AddApplicationCommandModule(typeof(StockpileCommands));
-    host.AddApplicationCommandModule(typeof(ManagementCommands));
-    host.AddComponentInteractionModule(typeof(StockpileModule));
+// Add commands from modules
+host.AddApplicationCommandModule(typeof(StockpileCommands));
+host.AddApplicationCommandModule(typeof(ManagementCommands));
+host.AddComponentInteractionModule(typeof(StockpileModule));
 host.AddEntryPointCommand("entrypoint", "Entry Point Command");
 await host.RunAsync();
