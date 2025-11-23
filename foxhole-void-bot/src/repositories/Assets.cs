@@ -45,7 +45,8 @@ namespace FoxholeBot.repositories
                 "MapLinnMercyHex.webp",
                 "MapLochMorHex.webp",
                 "MapMarbanHollow.webp",
-                "MapStemaLandingHex.webp"
+                "MapStemaLandingHex.webp",
+                "MapStonecradleHex.webp"
             ];
             return GetAssetFileLinks("map", files);
 
