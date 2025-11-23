@@ -2,10 +2,8 @@
 using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
 using FoxholeBot.commands;
-using FoxholeBot.Discord;
 using FoxholeBot.modal;
 using FoxholeBot.repositories;
-using FoxholeBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -57,7 +55,7 @@ builder.Services.AddScoped(sp =>
 {
     NavigationManager navigation = sp.GetRequiredService<NavigationManager>();
     return new HttpClient { BaseAddress = new Uri(navigation.BaseUri) };
-}).AddDiscordAuthentication(Config.GetBotClientId(), Config.GetBotClientSecret())
+})
 ;
 
 
@@ -69,8 +67,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.OperationFilter<DiscordAuthorizeFilter>();
 });
+builder.Services.AddDiscordSDK(Config.GetBotClientId());
 var host = builder.Build();
 
 if (host.Environment.IsDevelopment())

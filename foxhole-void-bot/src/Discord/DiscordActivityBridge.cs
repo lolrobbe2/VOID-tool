@@ -58,7 +58,7 @@
     public class DiscordActivityBridge
     {
         private readonly IJSRuntime _js;
-
+        private bool registered = false;
         public DiscordActivityBridge(IJSRuntime js)
         {
             _js = js;
@@ -66,6 +66,7 @@
         }
         public async Task RegisterDiscordMessageListenerAsync()
         {
+            if(registered) return;
             // Get the current assembly name dynamically
             string assemblyName = Assembly.GetExecutingAssembly().GetName().Name!;
 
@@ -74,7 +75,7 @@
                     DotNet.invokeMethodAsync('{assemblyName}', 'ReceiveDiscordMessage', event.data);
                 }});
             ";
-
+            registered = true;
             await _js.InvokeVoidAsync("eval", js);
         }
         public async Task PostCommandAsync(Opcodes opcode, object payload, string nonce, string sourceOrigin = "*")
@@ -84,7 +85,7 @@
                 (function() {{
                     var payloadObj = JSON.parse({JsonSerializer.Serialize(json)});
                     payloadObj.nonce = {JsonSerializer.Serialize(nonce)};
-                    var message = [{opcode}, payloadObj];
+                    var message = [{JsonSerializer.Serialize(opcode.ToString())}, payloadObj];
 
                     try {{ if (window.parent) window.parent.postMessage(message, '{sourceOrigin}'); }} catch(e){{}}
                     try {{ if (window.parent?.opener) window.parent.opener.postMessage(message, '{sourceOrigin}'); }} catch(e){{}}

@@ -1,16 +1,35 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 #nullable enable
 
 namespace FoxholeBot.src.Discord
 {
+    public struct HandshakePayload
+    {
+        [JsonPropertyName("v")]
+        public int V { get; set; }
+
+        [JsonPropertyName("encoding")]
+        public string Encoding { get; set; }
+
+        [JsonPropertyName("client_id")]
+        public string ClientId { get; set; }
+
+        [JsonPropertyName("frame_id")]
+        public string FrameId { get; set; }
+
+        [JsonPropertyName("sdk_version")]
+        public string? SdkVersion { get; set; }
+    }
     public class DiscordSDK
     {
         private static DiscordSDK? SingletonSDK { get; set; }
@@ -20,13 +39,16 @@ namespace FoxholeBot.src.Discord
         private IJSRuntime js { get; set; }
         private DiscordActivityBridge bridge { get; set; }
 
+        public string? clientId { get; private set; }
+
         IDictionary<string, TaskCompletionSource<object>> pendingCommands = new Dictionary<string, TaskCompletionSource<object>>();
-        public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation)
+        public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation, string clientId)
         {
             this.client = client;
             this.js = js;
             this.navigation = navigation;
             this.bridge = new DiscordActivityBridge(js);
+            this.clientId = clientId;
             SingletonSDK = this;
         }
         public void OnMessage(object data)
@@ -46,17 +68,44 @@ namespace FoxholeBot.src.Discord
         /// </summary>
         /// <param name="payload"></param>
         /// <returns></returns>
-        async Task<object> SendCommandAsync(object payload)
+        public async Task<object> SendCommandAsync(Opcodes opcode,object payload)
         {
+            await this.bridge.RegisterDiscordMessageListenerAsync();
+
             string nonce = Guid.NewGuid().ToString();
 
             // PostCommandAsync should return Task<T>
             var taskSource = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            await bridge.PostCommandAsync(Opcodes.FRAME, payload, nonce);
+            await bridge.PostCommandAsync(opcode, payload, nonce);
 
             pendingCommands.Add(nonce, taskSource);
             return await taskSource.Task;
+        }
+
+        private string? GetQueryParam(string param)
+        {
+            var uri = new Uri(navigation.Uri);
+            var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+            return queryParams.TryGetValue(param, out var value) ? value.ToString() : null;
+        }
+
+        public async Task<object> Handshake()
+        {
+            string frameId = GetQueryParam("frame_id") ?? "";
+            if(frameId == "")
+                return Task.CompletedTask;
+            HandshakePayload payload = new()
+            {
+                V = 1,
+                Encoding = "json",
+                ClientId = clientId!,
+                FrameId = frameId,
+                SdkVersion = "2.4.0"
+
+            };
+
+            return await SendCommandAsync(Opcodes.HANDSHAKE, payload);
         }
     }
 }

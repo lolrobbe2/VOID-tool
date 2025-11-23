@@ -43,7 +43,8 @@
     <Compile Include="src\AssetOptions.cs" />
     <Compile Include="src\Config.cs" />
     <Compile Include="src\Discord\DiscordActivityBridge.cs" />
-    <Compile Include="src\Discord\DiscordSDK.cs" />
+    <Compile Include="src\Discord\DiscordSdk.cs" />
+    <Compile Include="src\Discord\DiscordSDKServiceCollectionExtensions.cs" />
     <Compile Include="src\Discord\shemas\Authenticate.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
