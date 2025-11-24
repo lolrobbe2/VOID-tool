@@ -46,6 +46,7 @@
     <Compile Include="src\Discord\DiscordSdk.cs" />
     <Compile Include="src\Discord\DiscordSDKServiceCollectionExtensions.cs" />
     <Compile Include="src\Discord\shemas\Authenticate.cs" />
+    <Compile Include="src\Discord\shemas\EventBus.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
     <Compile Include="src\Main.cs" />

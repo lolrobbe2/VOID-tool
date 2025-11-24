@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
+using FoxholeBot.src.Discord.shemas;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -38,22 +39,40 @@ namespace FoxholeBot.src.Discord
         private NavigationManager navigation { get; set; }
         private IJSRuntime js { get; set; }
         private DiscordActivityBridge bridge { get; set; }
-
+        private EventBus bus { get; set; }
         public string? clientId { get; private set; }
+        bool registered {  get; set; }
 
         IDictionary<string, TaskCompletionSource<object>> pendingCommands = new Dictionary<string, TaskCompletionSource<object>>();
-        public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation, string clientId)
+        public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation, string clientId, EventBus bus)
         {
             this.client = client;
             this.js = js;
             this.navigation = navigation;
             this.bridge = new DiscordActivityBridge(js);
             this.clientId = clientId;
+            this.bus = bus;
             SingletonSDK = this;
         }
-        public void OnMessage(object data)
+
+        public async Task RegisterHandlers()
         {
-            var taskSource = pendingCommands["nonce here"];
+            if(registered) return;
+            await this.bus.on("message", OnMessage);
+            await this.bus.on("READY", OnReady);
+
+            registered = true;
+        }
+        public async Task OnMessage(object data)
+        {
+            //var taskSource = pendingCommands["nonce here"];
+            Console.WriteLine("message");
+        }
+
+        public async Task OnReady(object data)
+        {
+            //var taskSource = pendingCommands["nonce here"];
+            Console.WriteLine("ready");
         }
         [JSInvokable]
         public static void ReceiveDiscordMessage(object data)
@@ -70,8 +89,7 @@ namespace FoxholeBot.src.Discord
         /// <returns></returns>
         public async Task<object> SendCommandAsync(Opcodes opcode,object payload)
         {
-            await this.bridge.RegisterDiscordMessageListenerAsync();
-
+            await RegisterHandlers();
             string nonce = Guid.NewGuid().ToString();
 
             // PostCommandAsync should return Task<T>
