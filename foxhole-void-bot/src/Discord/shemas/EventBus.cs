@@ -4,20 +4,22 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace FoxholeBot.src.Discord.shemas
 {
     public class EventData<TPayload>
     {
-        public string name { get; set; } = string.Empty;
-        public TPayload payload { get; set; } = default!;
+        public string name { get; set; }
+        public TPayload payload { get; set; }
     }
     public class EventBus
     {
         private static Dictionary<Guid, EventBus> eventBusses = new();
 
-        private Dictionary<string, Func<object, Task>> events = new Dictionary<string, Func<object, Task>>(); 
+        private Dictionary<string, Func<JsonElement, Task>> events = new Dictionary<string, Func<JsonElement, Task>>(); 
         private readonly IJSRuntime _jsr;
         private readonly Guid guid = Guid.NewGuid();
         public EventBus(IJSRuntime jsr) 
@@ -25,7 +27,12 @@ namespace FoxholeBot.src.Discord.shemas
             _jsr = jsr;
             eventBusses[guid] = this;
         }
-        public async Task on(string name, Func<object, Task> handler) 
+
+        ~EventBus()
+        {
+            eventBusses.Remove(guid);
+        }
+        public async Task on(string name, Func<JsonElement, Task> handler) 
         {
             events[name] = handler;
             await RegisterListener(name);
@@ -36,7 +43,7 @@ namespace FoxholeBot.src.Discord.shemas
             events.Remove(name);    
         }
 
-        public void call(EventData<object> data) {
+        public void call(EventData<JsonElement> data) {
             if(events.TryGetValue(data.name, out var action))
             {
                 action(data.payload);
@@ -61,10 +68,13 @@ namespace FoxholeBot.src.Discord.shemas
         public static void ReceiveEvent(JsonElement data)
         {
             Console.WriteLine("message received");
-            EventData<JsonElement> evt = JsonSerializer.Deserialize<EventData<JsonElement>>(data.GetRawText());
+            EventData<JsonElement> evt = new() { name = data[0].ToString(), payload = data[1] };
+        
 
             foreach (var eventBus in eventBusses)
             {
+                if (eventBus.Key == Guid.Empty)
+                    continue;
                 eventBus.Value.call(evt);
             }
         }

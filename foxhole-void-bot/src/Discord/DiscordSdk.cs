@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -63,19 +64,20 @@ namespace FoxholeBot.src.Discord
 
             registered = true;
         }
-        public async Task OnMessage(object data)
+        public async Task OnMessage(JsonElement data)
         {
+            Opcodes code = (Opcodes)int.Parse(data[0].ToString());
             //var taskSource = pendingCommands["nonce here"];
             Console.WriteLine("message");
         }
 
-        public async Task OnReady(object data)
+        public async Task OnReady(JsonElement data)
         {
             //var taskSource = pendingCommands["nonce here"];
             Console.WriteLine("ready");
         }
         [JSInvokable]
-        public static void ReceiveDiscordMessage(object data)
+        public static void ReceiveDiscordMessage(JsonElement data)
         {
             // data is the message received via postMessage
             Console.WriteLine("Discord message received:");
