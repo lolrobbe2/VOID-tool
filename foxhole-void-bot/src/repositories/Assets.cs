@@ -26,6 +26,8 @@ namespace FoxholeBot.repositories
         {
             string[] files = [
                 "MapAshFieldsHex.webp",
+                "MapAcrithiaHex.webp",
+                "MapAllodsBightHex.webp",
                 "MapBasinSionnachHex.webp",
                 "MapCallahansPassageHex.webp",
                 "MapCallumsCapeHex.webp",
