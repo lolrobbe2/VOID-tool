@@ -71,6 +71,7 @@ namespace FoxholeBot.src.Discord
 
         public async Task OnMessage(object data)
         {
+            Opcodes code = (Opcodes)int.Parse(data[0].ToString());
             //var taskSource = pendingCommands["nonce here"];
             Console.WriteLine("message");
         }
@@ -80,7 +81,7 @@ namespace FoxholeBot.src.Discord
             Console.WriteLine("ready");
         }
         [JSInvokable]
-        public static void ReceiveDiscordMessage(object data)
+        public static void ReceiveDiscordMessage(JsonElement data)
         {
             // data is the message received via postMessage
             Console.WriteLine("Discord message received:");

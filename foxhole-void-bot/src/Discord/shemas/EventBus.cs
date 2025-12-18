@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace FoxholeBot.src.Discord.shemas
 {
@@ -27,7 +28,7 @@ namespace FoxholeBot.src.Discord.shemas
     {
         private static Dictionary<Guid, EventBus> eventBusses = new();
 
-        private Dictionary<string, Func<object, Task>> events = new Dictionary<string, Func<object, Task>>(); 
+        private Dictionary<string, Func<JsonElement, Task>> events = new Dictionary<string, Func<JsonElement, Task>>(); 
         private readonly IJSRuntime _jsr;
         private readonly Guid guid = Guid.NewGuid();
         public EventBus(IJSRuntime jsr) 
