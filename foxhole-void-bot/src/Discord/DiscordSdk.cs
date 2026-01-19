@@ -1,12 +1,15 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using FoxholeBot.src.Discord.shemas;
+using FoxholeBot.src.Discord.shemas.commands;
 using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -29,7 +32,7 @@ namespace FoxholeBot.src.Discord
         public string FrameId { get; set; }
 
         [JsonPropertyName("sdk_version")]
-        public string? SdkVersion { get; set; }
+        public string SdkVersion { get; set; }
     }
     public class DiscordSDK
     {
@@ -41,6 +44,8 @@ namespace FoxholeBot.src.Discord
         private DiscordActivityBridge bridge { get; set; }
         private EventBus bus { get; set; }
         public string? clientId { get; private set; }
+        public string? frameId { get; private set; }
+        public string? instanceId { get; private set; }
         bool registered {  get; set; }
 
         IDictionary<string, TaskCompletionSource<object>> pendingCommands = new Dictionary<string, TaskCompletionSource<object>>();
@@ -58,17 +63,17 @@ namespace FoxholeBot.src.Discord
         public async Task RegisterHandlers()
         {
             if(registered) return;
-            await this.bus.on("message", OnMessage);
-            await this.bus.on("READY", OnReady);
+            await bus.on("message",OnMessage);
+            await bus.on("READY", OnReady);
 
             registered = true;
         }
+
         public async Task OnMessage(object data)
         {
             //var taskSource = pendingCommands["nonce here"];
             Console.WriteLine("message");
         }
-
         public async Task OnReady(object data)
         {
             //var taskSource = pendingCommands["nonce here"];
@@ -79,7 +84,19 @@ namespace FoxholeBot.src.Discord
         {
             // data is the message received via postMessage
             Console.WriteLine("Discord message received:");
-            SingletonSDK.OnMessage(data);
+        }
+
+        public async Task<TResult> SendCommand<TCommand, TArgs, TResult>(ICommandStandard<TCommand, TArgs, TResult> command)
+          where TCommand : Enum
+          where TResult : class
+        {
+            return await SendCommand<TCommand, TArgs, TResult>(command.request);
+        }
+        public async Task<TResult> SendCommand<TCommand, TArgs, TResult>(SendCommandPayload<TCommand, TArgs> payload)
+           where TCommand : Enum
+           where TResult : class
+        {
+            return (TResult) await SendCommandAsync(payload);
         }
 
         /// <summary>
@@ -87,7 +104,7 @@ namespace FoxholeBot.src.Discord
         /// </summary>
         /// <param name="payload"></param>
         /// <returns></returns>
-        public async Task<object> SendCommandAsync(Opcodes opcode,object payload)
+        public async Task<object> SendCommandAsync(object payload)
         {
             await RegisterHandlers();
             string nonce = Guid.NewGuid().ToString();
@@ -95,7 +112,7 @@ namespace FoxholeBot.src.Discord
             // PostCommandAsync should return Task<T>
             var taskSource = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            await bridge.PostCommandAsync(opcode, payload, nonce);
+            await bridge.PostCommandAsync(Opcodes.FRAME,payload, nonce);
 
             pendingCommands.Add(nonce, taskSource);
             return await taskSource.Task;
@@ -108,22 +125,32 @@ namespace FoxholeBot.src.Discord
             return queryParams.TryGetValue(param, out var value) ? value.ToString() : null;
         }
 
-        public async Task<object> Handshake()
+        public async Task Handshake()
         {
-            string frameId = GetQueryParam("frame_id") ?? "";
-            if(frameId == "")
-                return Task.CompletedTask;
-            HandshakePayload payload = new()
+            frameId = GetQueryParam("frame_id") ?? "";
+            if (frameId == "")
+                return;
+
+            HandshakePayload payload = new HandshakePayload()
             {
+                ClientId = clientId!,
                 V = 1,
                 Encoding = "json",
-                ClientId = clientId!,
                 FrameId = frameId,
                 SdkVersion = "2.4.0"
-
             };
+            await bridge.PostCommandDirectAsync(Opcodes.HANDSHAKE,payload, "https://localhost:53409/");
+        }
 
-            return await SendCommandAsync(Opcodes.HANDSHAKE, payload);
+        public void HandleHandShake()
+        {
+            Console.WriteLine("Handshake");
+        }
+
+        public void HandleFrame(JsonElement frameData)
+        {
+            pendingCommands[frameData.GetProperty("nonce").ToString()].SetResult(frameData[0]);
+            pendingCommands.Remove(frameData.GetProperty("nonce").ToString());  
         }
     }
 }

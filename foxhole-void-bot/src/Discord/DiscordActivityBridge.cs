@@ -3,7 +3,9 @@
     using Microsoft.JSInterop;
     using System;
     using System.Reflection;
+    using System.Reflection.Emit;
     using System.Text.Json;
+    using System.Text.Json.Nodes;
     using System.Threading.Tasks;
     public enum Opcodes
     {
@@ -67,18 +69,51 @@
         public async Task PostCommandAsync(Opcodes opcode, object payload, string nonce, string sourceOrigin = "*")
         {
             string json = JsonSerializer.Serialize(payload);
-            
+            if (string.IsNullOrEmpty(sourceOrigin))
+                sourceOrigin = await GetOrigin();
             string js = $@"
                 (function() {{
                     var payloadObj = JSON.parse({JsonSerializer.Serialize(json)});
-                    payloadObj.nonce = {JsonSerializer.Serialize(nonce)};
-                    var message = [{JsonSerializer.Serialize(opcode)}, payloadObj];
-
-                    try {{ if (window.parent) window.parent.postMessage(message, '{sourceOrigin}'); }} catch(e){{}}
-                    try {{ if (window.parent?.opener) window.parent.opener.postMessage(message, '{sourceOrigin}'); }} catch(e){{}}
+                    payloadObj.nonce = '{JsonSerializer.Serialize(nonce)}';
+                    var message = [{(int)opcode}, payloadObj];
+                    var messageWindow = window.parent.opener ?? window.parent;
+                    messageWindow.postMessage(message, '{sourceOrigin}');
                 }})();
             ";
             await _js.InvokeVoidAsync("eval", js);
+        }
+        public async Task PostCommandDirectAsync(Opcodes opcode, object payload, string sourceOrigin = "")
+        {
+            string json = JsonSerializer.Serialize(payload);
+            if (string.IsNullOrEmpty(sourceOrigin))
+                sourceOrigin = "https://localhost:53409";
+            object[] message = new object[2];
+            message[0] = opcode;
+            message[1] = payload;
+            await PostMessage(JsonSerializer.SerializeToElement(message),sourceOrigin);
+        }
+        private async Task PostMessage(JsonElement element, string origin)
+        {
+            string js = $@"
+(function() {{ 
+    var messageWindow = window.parent.opener ?? window.parent;
+    var origin = document.referrer || '*';
+    messageWindow.postMessage({JsonSerializer.Serialize(element)}, origin); 
+}})();
+";
+            await _js.InvokeVoidAsync("eval", js);
+        }
+        public async Task<string> GetOrigin()
+        {
+            string js = @"
+(function() {
+    
+    return origin;
+})();
+";
+
+            return await _js.InvokeAsync<string>("eval", js);
+
         }
     }
 

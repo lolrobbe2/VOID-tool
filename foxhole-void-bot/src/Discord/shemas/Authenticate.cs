@@ -1,8 +1,15 @@
 ﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using FoxholeBot.src.Discord.shemas.commands;
 
+#nullable enable
 namespace FoxholeBot.src.Discord.shemas
 {
+    public class AuthenticateRequest
+    {
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; } = string.Empty;
+    }
     public class AuthenticateResponse
     {
         [JsonPropertyName("access_token")]

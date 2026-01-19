@@ -4,14 +4,24 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace FoxholeBot.src.Discord.shemas
 {
+
     public class EventData<TPayload>
     {
+        [JsonConstructor]
+        public EventData(JsonElement element)
+        {
+            name = element[0].ToString();
+            payload = JsonSerializer.Deserialize<TPayload>(element[1]);
+            guid = Guid.Parse(element[2].ToString());
+        }
         public string name { get; set; } = string.Empty;
         public TPayload payload { get; set; } = default!;
+        public Guid guid { get; set; } = Guid.Empty;
     }
     public class EventBus
     {
@@ -25,6 +35,10 @@ namespace FoxholeBot.src.Discord.shemas
             _jsr = jsr;
             eventBusses[guid] = this;
         }
+        ~EventBus()
+        {
+            eventBusses.Remove(guid);
+        }
         public async Task on(string name, Func<object, Task> handler) 
         {
             events[name] = handler;
@@ -35,13 +49,18 @@ namespace FoxholeBot.src.Discord.shemas
         {
             events.Remove(name);    
         }
-
-        public void call(EventData<object> data) {
+        
+        public void call<T>(EventData<T> data) {
             if(events.TryGetValue(data.name, out var action))
             {
                 action(data.payload);
             }
         }
+        /// <summary>
+        /// This fucntion registers and eventListener on the Web/Javascript side and will glue/bind it to the internal ReceiveEvent function
+        /// </summary>
+        /// <param name="name">name of the event</param>
+        /// <returns></returns>
         private async Task RegisterListener(string name) 
         {
             // Get the current assembly name dynamically
@@ -49,7 +68,7 @@ namespace FoxholeBot.src.Discord.shemas
 
             string js = $@"
                 window.addEventListener('{name}', function(event) {{
-                    const eventstruct = ['{name}',event.data];
+                    const eventstruct = ['{name}',event.data,'{guid.ToString()}'];
                     DotNet.invokeMethodAsync('{assemblyName}', 'ReceiveEvent', eventstruct);
                 }});
             ";
@@ -57,15 +76,19 @@ namespace FoxholeBot.src.Discord.shemas
             await _jsr.InvokeVoidAsync("eval", js);
         }
 
+        /// <summary>
+        /// This function is called when the eventBus receives an event.
+        /// </summary>
+        /// <param name="data"></param>
         [JSInvokable]
         public static void ReceiveEvent(JsonElement data)
         {
             Console.WriteLine("message received");
-            EventData<JsonElement> evt = JsonSerializer.Deserialize<EventData<JsonElement>>(data.GetRawText());
+            Console.WriteLine(data.GetRawText());
+            EventData<JsonElement> evt = new EventData<JsonElement>(data);
 
-            foreach (var eventBus in eventBusses)
-            {
-                eventBus.Value.call(evt);
+            if (eventBusses.TryGetValue(evt.guid, out EventBus bus)) {
+                bus.call(evt);
             }
         }
     }

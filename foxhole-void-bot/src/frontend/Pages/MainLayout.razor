@@ -1,5 +1,6 @@
 ﻿@using FoxholeBot;
 @using FoxholeBot.src.Discord
+@using FoxholeBot.src.Discord.commands
 @using Microsoft.JSInterop
 @using foxhole_void_bot.src.frontend.Pages.Components.SideBar
 @inherits LayoutComponentBase
@@ -25,6 +26,8 @@
         {
             await sdk.Handshake();
         }
+        //await sdk.SendCommand(new AuthenticateCommand());
+
         auth = true;
     }
 }
