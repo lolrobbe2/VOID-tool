@@ -8,8 +8,6 @@ premake.override(premake.vstudio.cs2005.elements, "projectProperties", function 
    platformsElement,
    })
 end)
-
-
 workspace "foxhole-void"
 architecture "x64"
    configurations { "Debug", "Release" }
@@ -19,11 +17,11 @@ architecture "x64"
       kind "ConsoleApp" -- CLI application
       dotnetframework "net9.0" -- Targeting .NET 9.0
       location "foxhole-void-bot"
-dotnetsdk "Web"
+      dotnetsdk "Web"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
-files { "%{prj.name}/src/**.cs", "%{prj.name}/src/**.env" }       -- Include all C# source files
-nuget { "NetCord:1.0.0-alpha.416", "DotNetEnv:3.1.1", "NetCord.Hosting:1.0.0-alpha.416", "NetCord.Hosting.Services:1.0.0-alpha.416", "Google.Cloud.Firestore:3.10.0", "Microsoft.AspNetCore.OpenApi:9.0.8", "Swashbuckle.AspNetCore:9.0.4", "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation: 9.0.8", "ClosedXML:0.105.0" }
+      files { "%{prj.name}/src/**.cs", "%{prj.name}/src/**.env" }       -- Include all C# source files
+      nuget { "NetCord:1.0.0-alpha.416", "DotNetEnv:3.1.1", "NetCord.Hosting:1.0.0-alpha.416", "NetCord.Hosting.Services:1.0.0-alpha.416", "Google.Cloud.Firestore:3.10.0", "Microsoft.AspNetCore.OpenApi:9.0.8", "Swashbuckle.AspNetCore:9.0.4", "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation: 9.0.8", "ClosedXML:0.105.0" }
       vsprops {
          PublishSingleFile = "true",
          SelfContained = "true",
@@ -38,4 +36,6 @@ nuget { "NetCord:1.0.0-alpha.416", "DotNetEnv:3.1.1", "NetCord.Hosting:1.0.0-alp
          symbols "Off"
          defines { "NDEBUG" }
          optimize "On"
+
+      
       
