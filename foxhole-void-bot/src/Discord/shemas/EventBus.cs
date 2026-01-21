@@ -28,7 +28,7 @@ namespace FoxholeBot.src.Discord.shemas
     {
         private static Dictionary<Guid, EventBus> eventBusses = new();
 
-        private Dictionary<string, Func<JsonElement, Task>> events = new Dictionary<string, Func<JsonElement, Task>>(); 
+        private Dictionary<string, Func<object, Task>> events = new Dictionary<string, Func<object, Task>>(); 
         private readonly IJSRuntime _jsr;
         private readonly Guid guid = Guid.NewGuid();
         public EventBus(IJSRuntime jsr) 
@@ -40,6 +40,10 @@ namespace FoxholeBot.src.Discord.shemas
         {
             eventBusses.Remove(guid);
         }
+        public void Remove()
+        {
+            eventBusses.Remove(guid);
+        }
         public async Task on(string name, Func<object, Task> handler) 
         {
             events[name] = handler;
@@ -48,13 +52,22 @@ namespace FoxholeBot.src.Discord.shemas
 
         public void off(string name)
         {
-            events.Remove(name);    
+            events.Remove(name);
         }
-        
-        public void call<T>(EventData<T> data) {
-            if(events.TryGetValue(data.name, out var action))
+
+        public void call<T>(EventData<T> data)
+        {
+            if (events.TryGetValue(data.name, out var action))
             {
                 action(data.payload);
+            }
+        }
+
+        public void call<T>(string name,T data)
+        {
+            if (events.TryGetValue(name, out var action))
+            {
+                action(data);
             }
         }
         /// <summary>

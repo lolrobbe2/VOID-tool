@@ -22,11 +22,13 @@
     protected async override void OnInitialized()
     {
         var assetMode = AssetConfig.Value.AssetMode;
+        await sdk.Ready();
         if (!auth)
         {
-            await sdk.Handshake();
+
+            //await sdk.SendCommand(new AuthenticateCommand());
+
         }
-        //await sdk.SendCommand(new AuthenticateCommand());
 
         auth = true;
     }

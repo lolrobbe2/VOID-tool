@@ -47,6 +47,10 @@ namespace FoxholeBot.src.Discord
         public string? frameId { get; private set; }
         public string? instanceId { get; private set; }
         bool registered {  get; set; }
+        public Task isReady => isReadySource.Task;
+        private readonly TaskCompletionSource<bool> isReadySource =
+            new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
 
         IDictionary<string, TaskCompletionSource<object>> pendingCommands = new Dictionary<string, TaskCompletionSource<object>>();
         public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation, string clientId, EventBus bus)
@@ -57,7 +61,14 @@ namespace FoxholeBot.src.Discord
             this.bridge = new DiscordActivityBridge(js);
             this.clientId = clientId;
             this.bus = bus;
+            this.registered = false;
             SingletonSDK = this;
+            Handshake();
+        }
+
+        ~DiscordSDK()
+        {
+            bus.Remove();
         }
 
         public async Task RegisterHandlers()
@@ -71,20 +82,30 @@ namespace FoxholeBot.src.Discord
 
         public async Task OnMessage(object data)
         {
-            Opcodes code = (Opcodes)int.Parse(data[0].ToString());
+            Opcodes code = (Opcodes)int.Parse(((JsonElement)data)[0].ToString());
             //var taskSource = pendingCommands["nonce here"];
+            switch (code)
+            {
+                case Opcodes.CLOSE:
+                    break;
+                case Opcodes.FRAME:
+                    HandleFrame(((JsonElement)data)[1]);
+                    break;
+            }
             Console.WriteLine("message");
         }
-        public async Task OnReady(object data)
+        /// <summary>
+        /// Awaitable method to wait for the SDK handshake to be ready.
+        /// </summary>
+        /// <returns></returns>
+        public async Task Ready()
+        {
+            await isReady;
+        }
+        private async Task OnReady(object data)
         {
             //var taskSource = pendingCommands["nonce here"];
-            Console.WriteLine("ready");
-        }
-        [JSInvokable]
-        public static void ReceiveDiscordMessage(JsonElement data)
-        {
-            // data is the message received via postMessage
-            Console.WriteLine("Discord message received:");
+            isReadySource.TrySetResult(true);
         }
 
         public async Task<TResult> SendCommand<TCommand, TArgs, TResult>(ICommandStandard<TCommand, TArgs, TResult> command)
@@ -128,6 +149,8 @@ namespace FoxholeBot.src.Discord
 
         public async Task Handshake()
         {
+            await RegisterHandlers();
+
             frameId = GetQueryParam("frame_id") ?? "";
             if (frameId == "")
                 return;
@@ -150,8 +173,13 @@ namespace FoxholeBot.src.Discord
 
         public void HandleFrame(JsonElement frameData)
         {
-            pendingCommands[frameData.GetProperty("nonce").ToString()].SetResult(frameData[0]);
-            pendingCommands.Remove(frameData.GetProperty("nonce").ToString());  
+            if (frameData.GetProperty("cmd").ToString() == "DISPATCH")
+                bus.call<JsonElement>(frameData.GetProperty("evt").ToString(), frameData.GetProperty("data"));
+            else
+            {
+                pendingCommands[frameData.GetProperty("nonce").ToString()].SetResult(frameData[0]);
+                pendingCommands.Remove(frameData.GetProperty("nonce").ToString());
+            }
         }
     }
 }
