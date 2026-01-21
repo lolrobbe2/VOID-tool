@@ -97,7 +97,7 @@
             string js = $@"
 (function() {{ 
     var messageWindow = window.parent.opener ?? window.parent;
-    var origin = document.referrer || '*';
+    var origin = !!document.referrer ? document.referrer : '*';
     messageWindow.postMessage({JsonSerializer.Serialize(element)}, origin); 
 }})();
 ";
