@@ -1,6 +1,7 @@
 ﻿@using FoxholeBot;
 @using FoxholeBot.src.Discord
 @using FoxholeBot.src.Discord.commands
+@using FoxholeBot.src.Discord.shemas
 @using Microsoft.JSInterop
 @using foxhole_void_bot.src.frontend.Pages.Components.SideBar
 @inherits LayoutComponentBase
@@ -26,8 +27,8 @@
         if (!auth)
         {
 
-            //await sdk.SendCommand(new AuthenticateCommand());
-
+            var test = await sdk.SendCommand(new AuthorizeCommand(sdk.clientId,[OAuthScope.Identify,OAuthScope.ApplicationsCommands]));
+            Console.WriteLine("yippee");
         }
 
         auth = true;

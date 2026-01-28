@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -52,7 +53,7 @@ namespace FoxholeBot.src.Discord
             new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
 
-        IDictionary<string, TaskCompletionSource<object>> pendingCommands = new Dictionary<string, TaskCompletionSource<object>>();
+        IDictionary<string, TaskCompletionSource<JsonElement>> pendingCommands = new ConcurrentDictionary<string, TaskCompletionSource<JsonElement>>();
         public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation, string clientId, EventBus bus)
         {
             this.client = client;
@@ -118,7 +119,7 @@ namespace FoxholeBot.src.Discord
            where TCommand : Enum
            where TResult : class
         {
-            return (TResult) await SendCommandAsync(payload);
+            return ((JsonElement) await SendCommandAsync(payload)).Deserialize<TResult>()!;
         }
 
         /// <summary>
@@ -132,12 +133,17 @@ namespace FoxholeBot.src.Discord
             string nonce = Guid.NewGuid().ToString();
 
             // PostCommandAsync should return Task<T>
-            var taskSource = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var taskSource = new TaskCompletionSource<JsonElement>(TaskCreationOptions.RunContinuationsAsynchronously);
+            pendingCommands.Add(nonce, taskSource);
 
             await bridge.PostCommandAsync(Opcodes.FRAME,payload, nonce);
-
-            pendingCommands.Add(nonce, taskSource);
-            return await taskSource.Task;
+            if (pendingCommands.TryGetValue(nonce, out TaskCompletionSource<JsonElement>? task))
+            {
+                var result = await task!.Task;
+                pendingCommands.Remove(nonce);
+                return  result;
+            }
+            throw new Exception("should not reach!");
         }
 
         private string? GetQueryParam(string param)
@@ -175,10 +181,11 @@ namespace FoxholeBot.src.Discord
         {
             if (frameData.GetProperty("cmd").ToString() == "DISPATCH")
                 bus.call<JsonElement>(frameData.GetProperty("evt").ToString(), frameData.GetProperty("data"));
-            else
+            else if (pendingCommands.TryGetValue(frameData.GetProperty("nonce").ToString(), out TaskCompletionSource<JsonElement>? task))
             {
-                pendingCommands[frameData.GetProperty("nonce").ToString()].SetResult(frameData[0]);
-                pendingCommands.Remove(frameData.GetProperty("nonce").ToString());
+                Console.WriteLine("hello world");
+                var result = frameData.GetProperty("data");
+                task.SetResult(result);
             }
         }
     }
