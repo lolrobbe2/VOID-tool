@@ -1,5 +1,7 @@
 ﻿namespace FoxholeBot.src.Discord
 {
+    using DocumentFormat.OpenXml.Office.Word;
+    using FoxholeBot.src.Discord.shemas.commands;
     using Microsoft.JSInterop;
     using System;
     using System.Reflection;
@@ -68,13 +70,16 @@
         }
         public async Task PostCommandAsync(Opcodes opcode, object payload, string nonce, string sourceOrigin = "*")
         {
-            string json = JsonSerializer.Serialize(payload);
+            var options = new JsonSerializerOptions{};
+            options.Converters.Add(new JsonStringEnumConverterGeneric<Commands>()); //Commands need to be converted to string hence we add the enum converter
+
+            string json = JsonSerializer.Serialize(payload,options);
             if (string.IsNullOrEmpty(sourceOrigin))
                 sourceOrigin = await GetOrigin();
             string js = $@"
                 (function() {{
-                    var payloadObj = JSON.parse({JsonSerializer.Serialize(json)});
-                    payloadObj.nonce = '{JsonSerializer.Serialize(nonce)}';
+                    var payloadObj = JSON.parse('{json}');
+                    payloadObj.nonce = '{nonce}';
                     var message = [{(int)opcode}, payloadObj];
                     var messageWindow = window.parent.opener ?? window.parent;
                     messageWindow.postMessage(message, '{sourceOrigin}');
