@@ -128,7 +128,11 @@ namespace FoxholeBot
         }
         public static string GetBotClientSecret()
         {
-            return GetEnvVariable("BOT_CLIENT_ID");
+            return GetEnvVariable("BOT_CLIENT_SECRET");
+        }
+        public static string GetJwtSecret()
+        {
+            return GetEnvVariable("JWT_SECRET");
         }
     }
 }

@@ -7,11 +7,11 @@ namespace FoxholeBot.src.Discord.commands
     {
         public AuthenticateCommand(AuthenticateRequest args)
         {
-            request = new SendCommandPayloadStandard<Commands, AuthenticateRequest>() { Cmd = Commands.AUTHORIZE, Args = args };
+            request = new SendCommandPayloadStandard<Commands, AuthenticateRequest>() { Cmd = Commands.AUTHENTICATE, Args = args };
         }
         public AuthenticateCommand()
         {
-            request = new SendCommandPayloadStandard<Commands, AuthenticateRequest>() { Cmd = Commands.AUTHORIZE, Args = new AuthenticateRequest() };
+            request = new SendCommandPayloadStandard<Commands, AuthenticateRequest>() { Cmd = Commands.AUTHENTICATE, Args = new AuthenticateRequest() };
         }
     }
 }

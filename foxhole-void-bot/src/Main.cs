@@ -6,6 +6,7 @@ using FoxholeBot.modal;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,7 +69,17 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSwaggerGen(c =>
 {
 });
-builder.Services.AddDiscordSDK(Config.GetBotClientId());
+builder.Services.AddDiscordSDK(Config.GetBotClientId(),Config.GetBotClientSecret(),Config.GetJwtSecret());
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DiscordActivity", policy =>
+    {
+        policy.WithOrigins("https://discord.com", "https://*.discordsays.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 var host = builder.Build();
 
 if (host.Environment.IsDevelopment())
@@ -102,10 +113,23 @@ if (host.Environment.IsDevelopment())
         RequestPath = "/css"
     });
 }
+host.Use((context, next) =>
+{
+    // De browser stuurt een preflight met deze header
+    if (context.Request.Method == "OPTIONS" &&
+        context.Request.Headers.ContainsKey("Access-Control-Request-Private-Network"))
+    {
+        context.Response.Headers.Append("Access-Control-Allow-Private-Network", "true");
+    }
+    return next();
+});
 
+host.UseCors("DiscordActivity");
 // Add commands from modules
 host.AddApplicationCommandModule(typeof(StockpileCommands));
 host.AddApplicationCommandModule(typeof(ManagementCommands));
 host.AddComponentInteractionModule(typeof(StockpileModule));
 host.AddEntryPointCommand("entrypoint", "Entry Point Command");
+host.UseAuthentication();
+host.UseAuthorization();
 await host.RunAsync();

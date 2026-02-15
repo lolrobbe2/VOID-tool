@@ -3,9 +3,11 @@
 @using FoxholeBot.src.Discord.commands
 @using FoxholeBot.src.Discord.shemas
 @using Microsoft.JSInterop
+@using System.Net.Http
 @using foxhole_void_bot.src.frontend.Pages.Components.SideBar
 @inherits LayoutComponentBase
 @inject DiscordSDK sdk
+@inject HttpClient client;
 @inject Microsoft.Extensions.Options.IOptions<AssetOptions> AssetConfig
 @inject IJSRuntime JS
 
@@ -27,7 +29,7 @@
         if (!auth)
         {
 
-            var test = await sdk.SendCommand(new AuthorizeCommand(sdk.clientId,[OAuthScope.Identify,OAuthScope.ApplicationsCommands]));
+            await sdk.Authenticate();
             Console.WriteLine("yippee");
         }
 

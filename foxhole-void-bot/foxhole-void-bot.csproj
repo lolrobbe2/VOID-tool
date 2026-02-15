@@ -43,18 +43,18 @@
     <Compile Include="src\AssetOptions.cs" />
     <Compile Include="src\Config.cs" />
     <Compile Include="src\Discord\AuthController.cs" />
-    <Compile Include="src\Discord\commands\Authenticate.cs" />
-    <Compile Include="src\Discord\commands\Authorize.cs" />
     <Compile Include="src\Discord\DiscordActivityBridge.cs" />
     <Compile Include="src\Discord\DiscordSDKServiceCollectionExtensions.cs" />
     <Compile Include="src\Discord\DiscordSdk.cs" />
     <Compile Include="src\Discord\Events.cs" />
+    <Compile Include="src\Discord\commands\Authenticate.cs" />
+    <Compile Include="src\Discord\commands\Authorize.cs" />
     <Compile Include="src\Discord\shemas\Authenticate.cs" />
     <Compile Include="src\Discord\shemas\Authorize.cs" />
-    <Compile Include="src\Discord\shemas\commands\ICommand.cs" />
-    <Compile Include="src\Discord\shemas\commands\ICommandPayload.cs" />
     <Compile Include="src\Discord\shemas\EventBus.cs" />
     <Compile Include="src\Discord\shemas\OAuthScopes.cs" />
+    <Compile Include="src\Discord\shemas\commands\ICommand.cs" />
+    <Compile Include="src\Discord\shemas\commands\ICommandPayload.cs" />
     <Compile Include="src\FireBase\ServiceAccountCredentials.cs" />
     <Compile Include="src\FireBase\ServiceCollectionExtension.cs" />
     <Compile Include="src\Main.cs" />
@@ -81,14 +81,15 @@
     <Compile Include="src\types\WindVector.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NetCord" Version="1.0.0-alpha.416" />
-    <PackageReference Include="DotNetEnv" Version="3.1.1" />
-    <PackageReference Include="NetCord.Hosting" Version="1.0.0-alpha.416" />
-    <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.416" />
-    <PackageReference Include="Google.Cloud.Firestore" Version="3.10.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version=" 9.0.8" />
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="NetCord" Version="1.0.0-alpha.416"/>
+    <PackageReference Include="DotNetEnv" Version="3.1.1"/>
+    <PackageReference Include="NetCord.Hosting" Version="1.0.0-alpha.416"/>
+    <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.416"/>
+    <PackageReference Include="Google.Cloud.Firestore" Version="3.10.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version=" 9.0.8"/>
+    <PackageReference Include="ClosedXML" Version="0.105.0"/>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0"/>
   </ItemGroup>
 </Project>

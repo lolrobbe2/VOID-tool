@@ -1,15 +1,23 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Wordprocessing;
+using FoxholeBot.src.Discord.commands;
 using FoxholeBot.src.Discord.shemas;
 using FoxholeBot.src.Discord.shemas.commands;
+using Google.Apis.Auth.OAuth2.Responses;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -18,6 +26,19 @@ using System.Threading.Tasks;
 
 namespace FoxholeBot.src.Discord
 {
+    public struct TokenResponse
+    {
+        [JsonPropertyName("token_type")]
+        public string TokenType { get; set; }
+        [JsonPropertyName("access_token")]
+        public string Token { get; set; }
+        [JsonPropertyName("expires_in")]
+        public int Expires { get; set; }
+        [JsonPropertyName("refresh_token")]
+        public string RefreshToken { get; set; }
+        [JsonPropertyName("scope")]
+        public string Scope { get; set; }
+    }
     public struct HandshakePayload
     {
         [JsonPropertyName("v")]
@@ -54,6 +75,10 @@ namespace FoxholeBot.src.Discord
 
 
         IDictionary<string, TaskCompletionSource<JsonElement>> pendingCommands = new ConcurrentDictionary<string, TaskCompletionSource<JsonElement>>();
+
+        public UserInfo? User { get; set; } = null;
+        public ApplicationInfo? Application { get; set; } = null;
+        public List<string>? Scopes { get; set; } = null;
         public DiscordSDK(IJSRuntime js, HttpClient client, NavigationManager navigation, string clientId, EventBus bus)
         {
             this.client = client;
@@ -109,6 +134,46 @@ namespace FoxholeBot.src.Discord
             isReadySource.TrySetResult(true);
         }
 
+
+        public async Task ExchangeToken(string accessToken)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/Auth/Token")
+            {
+                Content = JsonContent.Create(accessToken)
+            };
+
+            var response = await client.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            string result = await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetAccesToken()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/Auth/Token");
+
+            var response = await client.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task Authenticate()
+        {
+            AuthorizeResponse authResponse = await SendCommand(new AuthorizeCommand(clientId, [OAuthScope.Identify, OAuthScope.ApplicationsCommands]));
+            await ExchangeToken(authResponse.code);
+
+            AuthenticateResponse auth = await SendCommand(new AuthenticateCommand(new AuthenticateRequest()
+            {
+                AccessToken = await GetAccesToken()
+            }));
+
+            User = auth.User;
+            Application = auth.Application;
+            Scopes = auth.Scopes;
+        }
         public async Task<TResult> SendCommand<TCommand, TArgs, TResult>(ICommandStandard<TCommand, TArgs, TResult> command)
           where TCommand : Enum
           where TResult : class
