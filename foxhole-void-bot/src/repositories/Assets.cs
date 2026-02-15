@@ -26,6 +26,8 @@ namespace FoxholeBot.repositories
         {
             string[] files = [
                 "MapAshFieldsHex.webp",
+                "MapAcrithiaHex.webp",
+                "MapAllodsBightHex.webp",
                 "MapBasinSionnachHex.webp",
                 "MapCallahansPassageHex.webp",
                 "MapCallumsCapeHex.webp",
@@ -45,7 +47,8 @@ namespace FoxholeBot.repositories
                 "MapLinnMercyHex.webp",
                 "MapLochMorHex.webp",
                 "MapMarbanHollow.webp",
-                "MapStemaLandingHex.webp"
+                "MapStemaLandingHex.webp",
+                "MapStonecradleHex.webp"
             ];
             return GetAssetFileLinks("map", files);
 

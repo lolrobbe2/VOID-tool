@@ -152,7 +152,7 @@ namespace FoxholeBot.types
             },
              new(){
                 Name="Storm Cannon",
-                Bias=10,
+                Bias=50,
                 MinRange=400,
                 MaxRange=1000,
                 InacuracyMin=50,
@@ -164,7 +164,7 @@ namespace FoxholeBot.types
             },
             new(){
                 Name="Tempest Cannon RA-2",
-                Bias=10,
+                Bias=50,
                 MinRange=350,
                 MaxRange=500,
                 InacuracyMin=50,
@@ -176,7 +176,7 @@ namespace FoxholeBot.types
             },
              new(){
                 Name="Storm Cannon",
-                Bias=10,
+                Bias=50,
                 MinRange=400,
                 MaxRange=1000,
                 InacuracyMin=50,

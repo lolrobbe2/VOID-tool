@@ -3,6 +3,8 @@ using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
 using FoxholeBot.commands;
 using FoxholeBot.modal;
+using FoxholeBot.commands;
+using FoxholeBot.modal;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -113,16 +115,19 @@ if (host.Environment.IsDevelopment())
         RequestPath = "/css"
     });
 }
-host.Use((context, next) =>
+if (host.Environment.IsDevelopment())
 {
-    // De browser stuurt een preflight met deze header
-    if (context.Request.Method == "OPTIONS" &&
-        context.Request.Headers.ContainsKey("Access-Control-Request-Private-Network"))
+    host.Use((context, next) =>
     {
-        context.Response.Headers.Append("Access-Control-Allow-Private-Network", "true");
-    }
-    return next();
-});
+        // De browser stuurt een preflight met deze header
+        if (context.Request.Method == "OPTIONS" &&
+            context.Request.Headers.ContainsKey("Access-Control-Request-Private-Network"))
+        {
+            context.Response.Headers.Append("Access-Control-Allow-Private-Network", "true");
+        }
+        return next();
+    });
+}
 
 host.UseCors("DiscordActivity");
 // Add commands from modules
