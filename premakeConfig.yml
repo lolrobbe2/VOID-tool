@@ -1,2 +1,5 @@
 version: v5.0.0-beta7
-modules: {}
+modulesPath: modules
+librariesPath: libraries
+modules:
+libraries:

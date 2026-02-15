@@ -3,14 +3,18 @@ using foxhole_void_bot.src.frontend.Pages;
 using FoxholeBot;
 using FoxholeBot.commands;
 using FoxholeBot.modal;
+using FoxholeBot.commands;
+using FoxholeBot.modal;
 using FoxholeBot.repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.OpenApi.Models;
 using NetCord;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Rest;
@@ -20,6 +24,7 @@ using NetCord.Hosting.Services.ComponentInteractions;
 using NetCord.Rest;
 using NetCord.Services.ComponentInteractions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -49,12 +54,12 @@ builder.Services.Configure<AssetOptions>(options =>
 {
     options.AssetMode = Config.GetAssetMode();
 });
-
 builder.Services.AddScoped(sp =>
 {
     NavigationManager navigation = sp.GetRequiredService<NavigationManager>();
     return new HttpClient { BaseAddress = new Uri(navigation.BaseUri) };
-});
+})
+;
 
 
 
@@ -63,12 +68,30 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSwaggerGen(c =>
+{
+});
+builder.Services.AddDiscordSDK(Config.GetBotClientId(),Config.GetBotClientSecret(),Config.GetJwtSecret());
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DiscordActivity", policy =>
+    {
+        policy.WithOrigins("https://discord.com", "https://*.discordsays.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 var host = builder.Build();
 
 if (host.Environment.IsDevelopment())
 {
     host.MapOpenApi();
-    host.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "VOID api"));
+    host.UseSwaggerUI(options => {
+        options.SwaggerEndpoint("/openapi/v1.json", "VOID api");
+        
+        }
+    );
 }
 host.MapControllers();
 host.MapRazorPages();
@@ -92,10 +115,26 @@ if (host.Environment.IsDevelopment())
         RequestPath = "/css"
     });
 }
+if (host.Environment.IsDevelopment())
+{
+    host.Use((context, next) =>
+    {
+        // De browser stuurt een preflight met deze header
+        if (context.Request.Method == "OPTIONS" &&
+            context.Request.Headers.ContainsKey("Access-Control-Request-Private-Network"))
+        {
+            context.Response.Headers.Append("Access-Control-Allow-Private-Network", "true");
+        }
+        return next();
+    });
+}
 
-    // Add commands from modules
-    host.AddApplicationCommandModule(typeof(StockpileCommands));
-    host.AddApplicationCommandModule(typeof(ManagementCommands));
-    host.AddComponentInteractionModule(typeof(StockpileModule));
+host.UseCors("DiscordActivity");
+// Add commands from modules
+host.AddApplicationCommandModule(typeof(StockpileCommands));
+host.AddApplicationCommandModule(typeof(ManagementCommands));
+host.AddComponentInteractionModule(typeof(StockpileModule));
 host.AddEntryPointCommand("entrypoint", "Entry Point Command");
+host.UseAuthentication();
+host.UseAuthorization();
 await host.RunAsync();

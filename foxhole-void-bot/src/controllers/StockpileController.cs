@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using FoxholeBot.repositories;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 #nullable enable
 namespace FoxholeBot.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class StockpileController : ControllerBase
     {
         private readonly StockpilesRepository _stockpileRepository;

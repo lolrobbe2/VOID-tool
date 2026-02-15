@@ -43,7 +43,9 @@
                 await Task.Delay(50); // Let DOM update
                 var offset = random.Next(0, 10); // Random offset between 1–5 seconds
                 /* the video needs to be reloaded before playing */
+                try {
                 await JS.InvokeVoidAsync("reloadAndPlayVideo", videoRef,offset);
+                } catch(Exception){};
                 carouselTimer.Interval = random.Next(10000, 20000);
             });
         };

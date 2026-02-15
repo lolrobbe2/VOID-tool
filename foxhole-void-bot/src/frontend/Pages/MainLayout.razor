@@ -1,7 +1,16 @@
 ﻿@using FoxholeBot;
+@using FoxholeBot.src.Discord
+@using FoxholeBot.src.Discord.commands
+@using FoxholeBot.src.Discord.shemas
+@using Microsoft.JSInterop
+@using System.Net.Http
 @using foxhole_void_bot.src.frontend.Pages.Components.SideBar
 @inherits LayoutComponentBase
+@inject DiscordSDK sdk
+@inject HttpClient client;
 @inject Microsoft.Extensions.Options.IOptions<AssetOptions> AssetConfig
+@inject IJSRuntime JS
+
 <div class="body">
 
     <SideBar />
@@ -10,10 +19,20 @@
 
 @code {
     private string Title => "Foxhole VOID Bot";
+    private bool auth = false;
 
-    protected override void OnInitialized()
+
+    protected async override void OnInitialized()
     {
         var assetMode = AssetConfig.Value.AssetMode;
-        Console.WriteLine($"Mode: {assetMode}");
+        await sdk.Ready();
+        if (!auth)
+        {
+
+            await sdk.Authenticate();
+            Console.WriteLine("yippee");
+        }
+
+        auth = true;
     }
 }
