@@ -2,10 +2,4 @@ version: v5.0.0-beta7
 modulesPath: modules
 librariesPath: libraries
 modules:
-  Jarod42/premake-cmake:
-    version: '*'
-    entryPoint: 
 libraries:
-  StudioCherno/Walnut:
-    version: '*'
-    entryPoint:
