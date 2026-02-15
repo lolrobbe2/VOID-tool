@@ -77,6 +77,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("DiscordActivity", policy =>
     {
         policy.WithOrigins("https://discord.com", "https://*.discordsays.com")
+              .SetIsOriginAllowedToAllowWildcardSubdomains()
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
