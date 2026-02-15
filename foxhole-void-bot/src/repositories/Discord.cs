@@ -79,11 +79,7 @@ namespace FoxholeBot.repositories
         }
         public async Task<GuildChannel> GetChannel(Guild guild, string name)
         {
-            foreach(var channel in await GetChannels(guild))
-            {
-                Console.Write(channel.Name);
-            }
-            return (await GetChannels(guild)).FirstOrDefault(channel => channel.Name == name);
+            return (await GetChannels(guild)).FirstOrDefault(channel => channel.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task SendMessage(GuildChannel channel, MessageProperties properties)
