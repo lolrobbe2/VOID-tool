@@ -83,7 +83,7 @@ namespace FoxholeBot.repositories
             {
                 Console.Write(channel.Name);
             }
-            return (await GetChannels(guild)).FirstOrDefault(channel => channel.Name == name);
+            return (await GetChannels(guild)).FirstOrDefault(channel => channel.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task SendMessage(GuildChannel channel, MessageProperties properties)
